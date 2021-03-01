@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { View, Text, StyleSheet, FlatList, Button, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Button,
+  Dimensions,
+} from 'react-native';
 import Tile from './Tile';
 import Loading from './Loading';
 import Error from './Error';
@@ -10,7 +17,6 @@ import {
   getNeighbourToThe,
 } from '../util';
 
-
 import {
   colors,
   NUM_DAYS_IN_ROW,
@@ -19,6 +25,7 @@ import {
 } from '../consts';
 
 import gameReducer from '../reducers/gameReducer';
+import GameInfo from './GameInfo';
 export default function Board() {
   /**
    *
@@ -30,13 +37,16 @@ export default function Board() {
   const initialState = {
     loading: true,
     error: '',
+    allData: [],
     data: [],
+
   };
 
   const [realData, dispatch] = useReducer(gameReducer, initialState);
   const [newGame, setNewGame] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-
+  const [win, setWin] = useState(false);
+  // Fetch data on load
   useEffect(() => {
     async function go() {
       try {
@@ -44,10 +54,12 @@ export default function Board() {
 
         dispatch({ type: 'FETCH', error: '', payload: theAns });
         setNewGame(false);
+        setWin(false);
       } catch (err) {
         console.log(err);
         dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
         setNewGame(false);
+        setWin(false);
       }
     }
     go();
@@ -57,15 +69,45 @@ export default function Board() {
   useEffect(() => {
     if (!newGame) return;
     setGameOver(false); // okay?
-    dispatch({ type: 'SHUFFLE', payload: realData.data });
+    dispatch({ type: 'SHUFFLE', payload: realData.allData });
 
     setNewGame(false);
   }, [newGame]);
 
-  useEffect(()=>{
-    if(!gameOver) return;
-    // if it's game over, set the culprit(not here), set all to checked.
-  }, [gameOver])
+  // Reveal all tiles on game over.
+  useEffect(() => {
+    if (!gameOver) return;
+
+    const copy = realData.data;
+    const update = copy.map((d) => {
+      d.checked = true;
+      return d;
+    });
+    dispatch({ type: 'REVEAL_ALL', payload: update });
+  }, [gameOver]);
+
+  // Check if game should be over. This is for successful scenario. <Wet/> sets setGame(false) if a rainy day is clicked.
+  useEffect(() => {
+    function checkGameOver() {
+      // over success if... game is true & all dry are checked?
+      const copy = realData.data;
+      const numDryDaysUnchecked = copy.filter((day) => day.rain === 0);
+      const maybeOver = numDryDaysUnchecked.filter((dryDay) => !dryDay.checked);
+
+      if (!maybeOver.length) {
+        return true;
+      }
+      return false;
+    }
+  
+    if (gameOver) return;
+
+    const isGameOver = checkGameOver();
+    if (isGameOver) {
+      setGameOver(true);
+      setWin(true);
+    }
+  }, [setGameOver, gameOver, realData.data, setWin]);
 
   function renderTile(itemData) {
     return (
@@ -110,7 +152,6 @@ export default function Board() {
       return item;
     });
     dispatch({ type: 'CHECK_TILE', payload: updated });
-    
   }
 
   function handleDryClick(datum) {
@@ -140,7 +181,6 @@ export default function Board() {
       // Find days in each direction, 'click' on them.
 
       for (const direction of DIRECTIONS) {
-    
         if (shouldCheckInThisDirection(datum.id)[direction]()) {
           const thisOne = getNeighbourToThe(
             datum.id,
@@ -152,38 +192,45 @@ export default function Board() {
           handleDryClick(realData.data[thisOne]);
         }
       }
-
     }
   }
 
   return (
-    <View style={styles.board}>
-      {/* <Button title="press" onPress={() => setNewGame(true)} />
-      <Text>{gameOver ? 'game over' : 'game on'}</Text> */}
-       {!!realData.data && !!realData.data.length && (
-        <FlatList
-          // style={{ backgroundColor: colors.gray, padding: 8, borderRadius: 4 }}
-          data={realData.data.slice(0, 64)}
-          renderItem={renderTile}
-          numColumns={8}
-          key={(item, index) => item.date}
-        />
-      )} 
-    
-      {!!realData.error && <Error msg={realData.error}/>}
-      {!!realData.loading && <Loading />}
+    <View style={styles.boardWrap}>
+      <GameInfo
+        style={styles.gameInfo}
+        gameOver={gameOver}
+        setNewGame={setNewGame}
+        win={win}
+      />
+
+      <View style={styles.board}>
+  
+        {!!realData.data && !!realData.data.length ? (
+          <FlatList
+            data={realData.data.slice(0, NUM_DAYS_IN_GAME)}
+            renderItem={renderTile}
+            numColumns={NUM_DAYS_IN_ROW}
+            key={(item, index) => item.date}
+          />
+        ) : !realData.loading && realData.error.msg !== '' ? (
+          <Error msg={realData.error} />
+        ) : realData.loading ? (
+          <Loading />
+        ) : null}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+
   board: {
-    // flex: 1,
-     backgroundColor: colors.gray,
+    marginHorizontal: 4,
+    backgroundColor: colors.gray,
     padding: 4,
-    // flexWrap: 'wrap',
-    width: '100%',
+    maxWidth: '100%',
     borderRadius: 4,
-    height: Dimensions.get('window').width
+    height: Dimensions.get('window').width,
   },
 });

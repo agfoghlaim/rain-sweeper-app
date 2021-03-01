@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { sweeperDate } from '../util';
 import { Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
 
-import { colors } from '../consts';
+import { colors, NUM_DAYS_IN_ROW } from '../consts';
 
 export default function WetTile({ itemData, handleWetClick, gameOver }) {
   const [flagged, setFlagged] = useState(false);
   const date = sweeperDate(itemData.item.date);
+
+  useEffect(()=>{
+    if(!gameOver) return;
+    setFlagged(false);
+  },[gameOver])
 
   function localHandlePress() {
     if (gameOver) return;
@@ -22,13 +27,13 @@ export default function WetTile({ itemData, handleWetClick, gameOver }) {
     <TouchableHighlight
       activeOpacity={0.6}
       underlayColor="#DDDDDD"
-      style={styles.wetTile}
+      style={{...styles.wetTile, backgroundColor: itemData.item.culprit ? colors.red : colors.white}}
       onPress={localHandlePress}
       onLongPress={handleLongPress}
     >
       <>
         <Text style={styles.date}>{date}</Text>
-        {flagged && <Text>☂️</Text>}
+        {flagged && !gameOver && <Text>☂️</Text>}
         {gameOver && <Text>🌧️</Text>}
       </>
     </TouchableHighlight>
@@ -38,18 +43,18 @@ export default function WetTile({ itemData, handleWetClick, gameOver }) {
 const styles = StyleSheet.create({
   wetTile: {
     flex: 1,
-    height: (Dimensions.get('window').width - 7 - 16) / 8,
+    height: (Dimensions.get('window').width - 7 - 16) / NUM_DAYS_IN_ROW,
     margin: 1,
-    backgroundColor: colors.orange,
     borderRadius: 2,
     shadowColor: colors.black,
     elevation: 10,
-    // padding: 4,
     borderColor: colors.white,
     borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 
   date: {
-    fontSize: 6,
+    fontSize: 7,
   },
 });

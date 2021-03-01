@@ -1,7 +1,8 @@
 export const colors = {
 	black: '#333131',
   white: '#fff',
-  orange: '#ffd900',
+  // orange: '#ffd900',
+  orange: '#ffa410',
   purple: '#703fb9',
   red: '#ff401a',
   gray: '#cac4b9',

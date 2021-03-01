@@ -16,7 +16,7 @@ export default function Nasties({numNastyNeighbours}){
 			: colors.red
 	}
 	return(
-		<Text style={{...color}}>{numNastyNeighbours}</Text>
+		<Text style={{...color, fontWeight: 'bold'}}>{numNastyNeighbours}</Text>
 	)
 };
 

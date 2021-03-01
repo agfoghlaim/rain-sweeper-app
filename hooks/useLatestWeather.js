@@ -34,7 +34,7 @@ export default function useLatestWeather() {
         setLoading(false);
       })
       .catch((e) => {
-        console.log('EEE', e);
+        console.log('Error', e);
         setError(true);
         setLoading(false);
       });

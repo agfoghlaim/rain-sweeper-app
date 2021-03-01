@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { sweeperDate } from '../util';
 import { Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
 import { colors } from '../consts';
@@ -7,6 +7,11 @@ import Nasties from './Nasties';
 export default function DryTile({ itemData, handleDryClick, gameOver }) {
   const [flagged, setFlagged] = useState(false);
   const date = sweeperDate(itemData.item.date);
+
+  useEffect(() => {
+    if (!gameOver) return;
+    setFlagged(false);
+  }, [gameOver]);
 
   function localHandlePress() {
     if (gameOver) return;
@@ -37,7 +42,7 @@ export default function DryTile({ itemData, handleDryClick, gameOver }) {
           <Nasties numNastyNeighbours={itemData.item.numNastyNeighbours} />
         )}
 
-        {flagged && !itemData.item.checked && <Text>☂️</Text>}
+        {flagged && !itemData.item.checked && !gameOver && <Text>☂️</Text>}
       </>
     </TouchableHighlight>
   );
@@ -53,9 +58,11 @@ const styles = StyleSheet.create({
     elevation: 10,
     borderColor: colors.white,
     borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   date: {
-    fontSize: 6,
+    fontSize: 7,
   },
 });

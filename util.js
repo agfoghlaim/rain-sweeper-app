@@ -45,7 +45,7 @@ export async function fetchData() {
 
   const wet = shuffleArray(split.wet);
   const dry = shuffleArray(split.dry);
-  const winnableData = dry.slice(0, 500).concat(wet.slice(0, 100));
+  const winnableData = dry.slice(0, 1000).concat(wet.slice(0, 200));
   const theAns = shuffleArray(winnableData);
 
   // TODO this is stupid, should be done later to the chosen 64 not all 600, 

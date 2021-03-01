@@ -1,6 +1,5 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, Button} from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import GameScreen from './screens/Game';
 import Header from './components/Header';
@@ -18,8 +17,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    alignContent: 'center',
-    justifyContent: 'space-around',
+    alignContent: 'center'
   }
 
 });

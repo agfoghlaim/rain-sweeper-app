@@ -1,18 +1,9 @@
 import React, { useState } from 'react';
 import { sweeperDate } from '../util';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Button,
-  Dimensions,
-  TouchableOpacity,
-  TouchableHighlight,
-} from 'react-native';
-import { colors } from '../consts';
+
 import WetTile from './Wet';
 import DryTile from './Dry';
+
 export default function Tile({
   itemData,
   gameOver,
