@@ -6,7 +6,7 @@ export default function GameScreen() {
   return (
     <View style={styles.gameScreenWrap}>
       <View style={styles.topWrap}>
-        <Text style={{ color: '#fff' }}>Emoji Here</Text>
+        <Text style={{ color: colors.black }}>Emoji Here</Text>
         <Button style={styles.btn} title="New Game" />
       </View>
       <View style={styles.gameWrap}>
@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
   topWrap: {
     flex: 1,
     width: '100%',
+    padding: 16,
     backgroundColor: colors.white,
     flexDirection: 'row',
     justifyContent: 'space-between',

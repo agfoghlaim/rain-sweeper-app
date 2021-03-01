@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { View, Text, StyleSheet, FlatList, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Button, Dimensions } from 'react-native';
 import Tile from './Tile';
-
+import Loading from './Loading';
+import Error from './Error';
 
 import {
   fetchData,
@@ -151,45 +152,38 @@ export default function Board() {
           handleDryClick(realData.data[thisOne]);
         }
       }
-      // DIRECTIONS.forEach((direction) => {
-      //   if (shouldCheckInThisDirection(datum.id)[direction]()) {
-      //     const thisOne = getNeighbourToThe(
-      //       datum.id,
-      //       direction,
-      //       NUM_DAYS_IN_GAME,
-      //       NUM_DAYS_IN_ROW
-      //     );
-      //     handleDryClick(realData.data[thisOne]);
-      //   }
-      // });
+
     }
   }
 
   return (
-    <View styles={styles.board}>
-      <Button title="press" onPress={() => setNewGame(true)} />
-      <Text>{gameOver ? 'game over' : 'game on'}</Text>
-      {!!realData.data && !!realData.data.length && (
+    <View style={styles.board}>
+      {/* <Button title="press" onPress={() => setNewGame(true)} />
+      <Text>{gameOver ? 'game over' : 'game on'}</Text> */}
+       {!!realData.data && !!realData.data.length && (
         <FlatList
-          style={{ backgroundColor: colors.gray, padding: 8, borderRadius: 4 }}
+          // style={{ backgroundColor: colors.gray, padding: 8, borderRadius: 4 }}
           data={realData.data.slice(0, 64)}
           renderItem={renderTile}
           numColumns={8}
           key={(item, index) => item.date}
         />
-      )}
-      {!!realData.error && <Text>Error: {realData.error}</Text>}
-      {!!realData.loading && <Text>Loading...</Text>}
+      )} 
+    
+      {!!realData.error && <Error msg={realData.error}/>}
+      {!!realData.loading && <Loading />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   board: {
-    flex: 1,
-    // backgroundColor: 'red',
-    padding: 8,
-    flexWrap: 'wrap',
+    // flex: 1,
+     backgroundColor: colors.gray,
+    padding: 4,
+    // flexWrap: 'wrap',
     width: '100%',
+    borderRadius: 4,
+    height: Dimensions.get('window').width
   },
 });
