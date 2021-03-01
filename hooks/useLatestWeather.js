@@ -4,7 +4,7 @@ export default function useLatestWeather() {
   const [weather, setWeather] = useState();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     const url = 'https://irish-apis.netlify.app/weather/api';
 
@@ -30,8 +30,6 @@ export default function useLatestWeather() {
     })
       .then((res) => res.json())
       .then((ans) => {
- 
-
         setWeather(ans.data.presentObservations.stations);
         setLoading(false);
       })
