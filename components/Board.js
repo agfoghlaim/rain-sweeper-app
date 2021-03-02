@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Button,
-  Dimensions,
-} from 'react-native';
+import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
+
+import GameInfo from './GameInfo';
 import Tile from './Tile';
 import Loading from './Loading';
 import Error from './Error';
@@ -15,6 +10,9 @@ import {
   fetchData,
   shouldCheckInThisDirection,
   getNeighbourToThe,
+  setCheckedToTrue,
+  checkGameOver,
+  setCulprit,
 } from '../util';
 
 import {
@@ -25,7 +23,6 @@ import {
 } from '../consts';
 
 import gameReducer from '../reducers/gameReducer';
-import GameInfo from './GameInfo';
 export default function Board() {
   /**
    *
@@ -37,29 +34,24 @@ export default function Board() {
   const initialState = {
     loading: true,
     error: '',
-    allData: [],
-    data: [],
-
+    allData: [], // all data shuffled & with numNastyNeighbours- ration is 1:5 wet:dry
+    data: [], // game data, .length === NUM_DAYS_IN_GAME
   };
 
   const [realData, dispatch] = useReducer(gameReducer, initialState);
   const [newGame, setNewGame] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [win, setWin] = useState(false);
+
   // Fetch data on load
   useEffect(() => {
     async function go() {
       try {
-        const theAns = await fetchData();
-
-        dispatch({ type: 'FETCH', error: '', payload: theAns });
-        setNewGame(false);
-        setWin(false);
+        const allData = await fetchData();
+        dispatch({ type: 'FETCH', error: '', payload: allData });
       } catch (err) {
         console.log(err);
         dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
-        setNewGame(false);
-        setWin(false);
       }
     }
     go();
@@ -69,6 +61,7 @@ export default function Board() {
   useEffect(() => {
     if (!newGame) return;
     setGameOver(false); // okay?
+    setWin(false);
     dispatch({ type: 'SHUFFLE', payload: realData.allData });
 
     setNewGame(false);
@@ -78,31 +71,17 @@ export default function Board() {
   useEffect(() => {
     if (!gameOver) return;
 
-    const copy = realData.data;
-    const update = copy.map((d) => {
-      d.checked = true;
-      return d;
-    });
-    dispatch({ type: 'REVEAL_ALL', payload: update });
+    // Set all realData.data.checked = true.
+    const revealed = setCheckedToTrue(realData.data);
+
+    dispatch({ type: 'REVEAL_ALL', payload: revealed });
   }, [gameOver]);
 
   // Check if game should be over. This is for successful scenario. <Wet/> sets setGame(false) if a rainy day is clicked.
   useEffect(() => {
-    function checkGameOver() {
-      // over success if... game is true & all dry are checked?
-      const copy = realData.data;
-      const numDryDaysUnchecked = copy.filter((day) => day.rain === 0);
-      const maybeOver = numDryDaysUnchecked.filter((dryDay) => !dryDay.checked);
-
-      if (!maybeOver.length) {
-        return true;
-      }
-      return false;
-    }
-  
     if (gameOver) return;
 
-    const isGameOver = checkGameOver();
+    const isGameOver = checkGameOver(realData.data);
     if (isGameOver) {
       setGameOver(true);
       setWin(true);
@@ -126,16 +105,9 @@ export default function Board() {
     // set which day done it...
     const badDay = data.id;
 
-    const copy = realData.data;
-    const updated = copy.map((item) => {
-      if (item.id === badDay) {
-        return {
-          ...item,
-          culprit: true,
-        };
-      }
-      return item;
-    });
+    // map data and add a .culprit = true to the day that lost the game.
+    const updated = setCulprit(realData.data, badDay);
+
     dispatch({ type: 'CHECK_TILE', payload: updated });
   }
 
@@ -205,9 +177,9 @@ export default function Board() {
       />
 
       <View style={styles.board}>
-  
         {!!realData.data && !!realData.data.length ? (
           <FlatList
+            style={styles.boardBg}
             data={realData.data.slice(0, NUM_DAYS_IN_GAME)}
             renderItem={renderTile}
             numColumns={NUM_DAYS_IN_ROW}
@@ -224,13 +196,13 @@ export default function Board() {
 }
 
 const styles = StyleSheet.create({
-
+  boardWrap: {
+    flex: 1,
+    backgroundColor: colors.black,
+    padding: 8,
+  },
   board: {
-    marginHorizontal: 4,
-    backgroundColor: colors.gray,
-    padding: 4,
-    maxWidth: '100%',
-    borderRadius: 4,
-    height: Dimensions.get('window').width,
+    flex: 6,
+    minHeight: Dimensions.get('window').width,
   },
 });

@@ -5,16 +5,13 @@ import Board from '../components/Board';
 export default function GameScreen() {
   return (
     <View style={styles.gameScreenWrap}>
-      <View style={styles.gameWrap}>
-        <Board />
-      </View>
+      <Board />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   gameScreenWrap: {
-    backgroundColor: colors.black,
     flex: 1,
     width: '100%',
   },

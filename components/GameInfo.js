@@ -32,15 +32,13 @@ export default function GameInfo({ gameOver, setNewGame, win }) {
 const styles = StyleSheet.create({
   gameInfo: {
     flex: 1,
-    minHeight: '30%',
+    minHeight: 64,
     padding: 16,
-    margin: 20,
     backgroundColor: colors.gray,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 32,
-    marginHorizontal: 4,
+    marginVertical: 16,
     borderRadius: 4,
   },
 });

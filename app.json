@@ -1,9 +1,12 @@
 {
   "expo": {
-    "name": "rain-sweeper",
+    "name": "Galway RainSweeper",
     "slug": "rain-sweeper",
     "version": "1.0.0",
     "orientation": "portrait",
+    "platforms": [
+      "android"
+    ],
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
@@ -21,7 +24,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "bagroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       }
     },

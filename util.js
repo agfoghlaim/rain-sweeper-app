@@ -31,6 +31,7 @@ export async function fetchData() {
   });
   const ans = await res.json();
 
+  // Split the response into {wet, dry}.
   const split = ans.data.dailyData.reduce(
     (acc, cur) => {
       if (cur.rain > 0) {
@@ -43,17 +44,29 @@ export async function fetchData() {
     { wet: [], dry: [] }
   );
 
+  // Shuffle the wet/dry arrays.
   const wet = shuffleArray(split.wet);
   const dry = shuffleArray(split.dry);
+
+  // Concat wet/dry arrays @ 5:1 (dry:wet) ratio.
   const winnableData = dry.slice(0, 1000).concat(wet.slice(0, 200));
-  const theAns = shuffleArray(winnableData);
 
-  // TODO this is stupid, should be done later to the chosen 64 not all 600, 
-  const winnableDataWithnNastyNeighbours = addNumNastyNeighboursToShuffledData(
-    theAns
-  );
+  // Shuffle the data.
+  const allDataShuffled = shuffleArray(winnableData);
 
-  return winnableDataWithnNastyNeighbours;
+  // Slice off gameData( .length === NUM_DAYS_IN_GAME )l
+  const gameData = allDataShuffled.slice(0, NUM_DAYS_IN_GAME);
+
+  // Add .numNastyNeighbours to the gameData.
+  const gameDataWithNumNasties = addNumNastyNeighboursToShuffledData(gameData);
+
+  // Return object.
+  // object.allData length is 1200 long & can be shuffled to create more gameData without re fetching.
+  // object.gameData length is NUM_DAYS_IN_GAME
+  return {
+    allData: allDataShuffled,
+    gameData: gameDataWithNumNasties,
+  };
 }
 
 export function addNumNastyNeighboursToShuffledData(days) {
@@ -75,6 +88,7 @@ export function addNumNastyNeighboursToShuffledData(days) {
   }
   return days;
 }
+
 export function shouldCheckInThisDirection(i) {
   /**
    * if seeking square to the west, don't check if current square is @ left of the board or square[0]
@@ -90,6 +104,11 @@ export function shouldCheckInThisDirection(i) {
     south: () => !isBottom(i),
     southWest: () => !isBottom(i) && !isLeft(i),
   };
+}
+
+// Used in gameReducer 'SHUFFLE'.
+export function sliceNumDaysInAGameConst(arr) {
+  return arr.slice(0, NUM_DAYS_IN_GAME);
 }
 
 export function hasNastyNeighbour(i, direction, days) {
@@ -121,8 +140,8 @@ export function hasNastyNeighbour(i, direction, days) {
 
   return days[relevantNeighbourIndex].rain > 0;
 }
-export function getNeighbourToThe(i, direction) {
 
+export function getNeighbourToThe(i, direction) {
   const neighbours = {
     west: i - 1,
     northWest: i - NUM_DAYS_IN_ROW - 1,
@@ -135,36 +154,53 @@ export function getNeighbourToThe(i, direction) {
   };
   return neighbours[direction];
 }
-export function sweeperDate(string) {
-  const dateInFormatFirefoxLikes = string.replace(/-/g, '/');
 
+export function sweeperDate(string) {
+  // string from api will be in format "05-mar-2010".
+  // function will return "5 Mar '10".
   const d = new Date(string);
-  const year = d.getFullYear().toString().substring(2,4);
-  //const month = d.getMonth();
-  const month = d.toLocaleString('default', { month: 'long' }).substring(4, 7)
+  const year = d.getFullYear().toString().substring(2, 4); // "19"
+  const month = d.toLocaleString('default', { month: 'long' }).substring(4, 7); // "Jan"
   const day = d.getDate();
-  return `${day} ${month} '${year}`
-  // eg 11 Feb 18
-  
-  // return new Date(dateInFormatFirefoxLikes).toLocaleString('en-GB', {
-  //   day: 'numeric',
-  //   month: 'short',
-  //   year: '2-digit',
-  // });
-  // return new Date(string).toLocaleString('en-GB', {
-  //   day: 'numeric',
-  //   month: 'short',
-  //   year: '2-digit',
-  // });
+  return `${day} ${month} '${year}`;
 }
 
 export function setCheckedToFalse(arr) {
   return arr.map((day) => {
     day.checked = false;
-
     return day;
   });
 }
+export function setCheckedToTrue(arr) {
+  return arr.map((day) => {
+    day.checked = true;
+    return day;
+  });
+}
+
+export function checkGameOver(copy) {
+  // over success if... game is true & all dry are checked?
+  const numDryDaysUnchecked = copy.filter((day) => day.rain === 0);
+  const maybeOver = numDryDaysUnchecked.filter((dryDay) => !dryDay.checked);
+
+  if (!maybeOver.length) {
+    return true;
+  }
+  return false;
+}
+
+export function setCulprit(arr, culpritId) {
+  return arr.map((item) => {
+    if (item.id === culpritId) {
+      return {
+        ...item,
+        culprit: true,
+      };
+    }
+    return item;
+  });
+}
+
 function isLeft(num) {
   return num % NUM_DAYS_IN_ROW === 0;
 }
@@ -177,4 +213,3 @@ function isTop(num) {
 function isBottom(num) {
   return num >= NUM_DAYS_IN_GAME - NUM_DAYS_IN_ROW;
 }
-

@@ -2,9 +2,8 @@ import {
   shuffleArray,
   addNumNastyNeighboursToShuffledData,
   setCheckedToFalse,
+  sliceNumDaysInAGameConst,
 } from '../util';
-
-import {NUM_DAYS_IN_GAME} from '../consts';
 
 export default function gameReducer(state, action) {
   switch (action.type) {
@@ -12,8 +11,8 @@ export default function gameReducer(state, action) {
       return {
         loading: false,
         error: '',
-        data: action.payload.slice(0,NUM_DAYS_IN_GAME),
-        allData: action.payload
+        data: action.payload.gameData,
+        allData: action.payload.allData,
       };
     case 'FETCH_ERROR':
       return {
@@ -22,10 +21,19 @@ export default function gameReducer(state, action) {
         error: action.error,
       };
     case 'SHUFFLE':
+      // payload is allData, do the following 4 things to it & return some gameData.
       const { payload } = action;
-      const ans = [
+      const gameData = [
+        // 1. shuffle allData,
         shuffleArray,
+
+        // 2. slice off gameData (.length === NUM_DAYS_IN_GAME),
+        sliceNumDaysInAGameConst,
+
+        // 3. set all data[checked] to false,
         setCheckedToFalse,
+
+        // 4. add data[numNastyNeighbours] to gameData.
         addNumNastyNeighboursToShuffledData,
       ].reduce((payload, fn) => {
         return fn(payload);
@@ -33,7 +41,7 @@ export default function gameReducer(state, action) {
 
       return {
         ...state,
-        data: ans.slice(0,NUM_DAYS_IN_GAME),
+        data: gameData,
       };
 
     case 'CHECK_TILE':
@@ -43,9 +51,9 @@ export default function gameReducer(state, action) {
       };
     case 'REVEAL_ALL':
       return {
-        ...state, 
-        data: action.payload
-      }
+        ...state,
+        data: action.payload,
+      };
 
     default:
       return { ...state };
