@@ -3,28 +3,39 @@ import { View, Text, Button, StyleSheet } from 'react-native';
 
 import { colors } from '../consts';
 
-export default function GameInfo({ gameOver, setNewGame, win }) {
+export default function GameInfo({ gameOver, newGame, setNewGame, win, roll }) {
+  function decideEmoji() {
+    if (gameOver && typeof newGame === 'undefined') {
+      return '😴';
+    } else if (!gameOver && typeof newGame === 'boolean') {
+      return '🤔';
+    } else if (win && gameOver && typeof newGame === 'boolean') {
+      return '😀';
+    } else if (
+      typeof newGame === 'boolean' &&
+      typeof win === 'boolean' &&
+      gameOver
+    ) {
+      return '😒';
+    } else {
+      return '>';
+    }
+  }
+  
   return (
     <View style={styles.gameInfo}>
-      <Text
-        style={{
-          color: colors.black,
-          fontSize: 18,
-          letterSpacing: -2,
-          fontWeight: 'bold',
-        }}
-      >
-        {gameOver ? 'Game Over' : 'Game On'}
-      </Text>
-      {win && gameOver && <Text style={{ fontSize: 32 }}>😀</Text>}
-      {!win && gameOver && <Text style={{ fontSize: 32 }}>😒</Text>}
-      {!gameOver && <Text style={{ fontSize: 32 }}>🤔</Text>}
-      <Button
-        color={colors.black}
-        accessibilityLabel="New Game"
-        title="New Game"
-        onPress={() => setNewGame(true)}
-      />
+      <Text style={{ fontSize: 32 }}> {decideEmoji()}</Text>
+
+      {!gameOver && <Text>Round: {roll + 1}</Text>}
+
+      {gameOver && (
+        <Button
+          color={colors.black}
+          accessibilityLabel={win ? 'Next Round' : 'New Game'}
+          title={win ? 'Next Round' : 'New Game'}
+          onPress={() => setNewGame(true)}
+        />
+      )}
     </View>
   );
 }

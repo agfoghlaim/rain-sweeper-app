@@ -4,6 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { colors } from '../consts';
 
 export default function Error({msg}) {
+
   return (
     <View style={styles.loadingWrap}>
       <Text style={styles.emoji} >🤔</Text>

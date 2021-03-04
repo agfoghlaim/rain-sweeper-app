@@ -27,7 +27,7 @@ export default function WetTile({ itemData, handleWetClick, gameOver }) {
     <TouchableHighlight
       activeOpacity={0.6}
       underlayColor="#DDDDDD"
-      style={{...styles.wetTile, backgroundColor: itemData.item.culprit ? colors.red : colors.white}}
+      style={{...styles.wetTile, backgroundColor: itemData.item.culprit ? colors.red : colors.orange}}
       onPress={localHandlePress}
       onLongPress={handleLongPress}
     >

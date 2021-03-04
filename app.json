@@ -23,10 +23,13 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "ie.marie.galway_rain_sweeper",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "bagroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -11,6 +11,7 @@ export default function gameReducer(state, action) {
       return {
         loading: false,
         error: '',
+        roll: 0,
         data: action.payload.gameData,
         allData: action.payload.allData,
       };
@@ -19,6 +20,16 @@ export default function gameReducer(state, action) {
         ...state,
         loading: false,
         error: action.error,
+      };
+    case 'ROLL':
+      return {
+        ...state,
+        roll: action.payload
+      };
+    case 'CULPRIT':
+      return {
+        ...state,
+        culprit: action.payload
       };
     case 'SHUFFLE':
       // payload is allData, do the following 4 things to it & return some gameData.
