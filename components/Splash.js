@@ -2,12 +2,12 @@ import React from 'react';
 import { View, StyleSheet, Dimensions, Text } from 'react-native';
 import { colors } from '../consts';
 
-export default function Splash({win, roll, rain, date }) {
+export default function Splash({ win, numWet, rain, date }) {
+
   return win ? (
     <View style={styles.splash}>
-      <Text style={styles.text1}>{roll} in a row</Text>
-      <Text style={styles.text1}>Keep going</Text>
-      <Text style={styles.emoji}>😬</Text>
+      <Text style={styles.emoji}>😎</Text>
+      <Text style={styles.text2}>You avoided {numWet} rainy days</Text>
     </View>
   ) : (
     <View style={styles.splash}>
@@ -27,11 +27,11 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     position: 'absolute',
     zIndex: 9,
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   text1: { color: 'white', fontSize: 32, fontWeight: 'bold' },
   text2: { color: colors.orange, fontSize: 16, fontWeight: 'bold' },
-  emoji: { fontSize: 32 },
+  emoji: { fontSize: 32, margin: 20 },
 });

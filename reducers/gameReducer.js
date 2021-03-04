@@ -14,6 +14,7 @@ export default function gameReducer(state, action) {
         roll: 0,
         data: action.payload.gameData,
         allData: action.payload.allData,
+        score: 0
       };
     case 'FETCH_ERROR':
       return {

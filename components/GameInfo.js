@@ -3,7 +3,14 @@ import { View, Text, Button, StyleSheet } from 'react-native';
 
 import { colors } from '../consts';
 
-export default function GameInfo({ gameOver, newGame, setNewGame, win, roll }) {
+export default function GameInfo({
+  gameOver,
+  newGame,
+  score,
+  setNewGame,
+  win,
+  roll,
+}) {
   function decideEmoji() {
     if (gameOver && typeof newGame === 'undefined') {
       return '😴';
@@ -24,11 +31,13 @@ export default function GameInfo({ gameOver, newGame, setNewGame, win, roll }) {
 
   return (
     <View style={styles.gameInfo}>
+
+      <Text style={styles.score}>Score: {score}</Text>
       <Text style={{ fontSize: 32 }}> {decideEmoji()}</Text>
 
-      {!gameOver && <Text>Round: {roll + 1}</Text>}
-
-      {gameOver && (
+      {!gameOver ? (
+        <Text style={styles.round}>Round: {roll + 1}</Text>
+      ) : (
         <Button
           color={colors.black}
           accessibilityLabel={win ? 'Next Round' : 'New Game'}
@@ -52,4 +61,24 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     borderRadius: 4,
   },
+  score: {
+    fontFamily: 'monospace',
+    fontWeight: '700',
+    fontSize: 14,
+    color: colors.red,
+    backgroundColor: colors.white,
+    paddingVertical: 5,
+    paddingHorizontal:10,
+    borderRadius: 4
+  },
+  round: {
+    fontFamily: 'monospace',
+    fontWeight: '700',
+    fontSize: 14,
+    color: colors.white,
+    backgroundColor: colors.red,
+    paddingVertical: 5,
+    paddingHorizontal:10,
+    borderRadius: 4
+  }
 });

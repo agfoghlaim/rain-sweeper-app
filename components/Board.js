@@ -41,7 +41,7 @@ export default function Board() {
     loading: true,
     error: '',
     culprit: null,
-    allData: [], // all data shuffled & with numNastyNeighbours- ration is 1:5 wet:dry
+    allData: [], // all data shuffled & with numNastyNeighbours- ratio is 1:5 wet:dry
     data: [], // game data, .length === NUM_DAYS_IN_GAME
   };
 
@@ -50,8 +50,8 @@ export default function Board() {
   const [gameOver, setGameOver] = useState(true);
   const [win, setWin] = useState(undefined);
   const [showSplash, setShowSplash] = useState(false);
-  const [isRoundOne, setIsRoundOne] = useState(true);
   const splashTimer = useRef(null);
+  const [numWet, setNumWet] = useState(null);
 
   // Fetch data on load
   useEffect(() => {
@@ -64,6 +64,7 @@ export default function Board() {
         dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
       }
     }
+  
     go();
   }, []);
 
@@ -73,16 +74,27 @@ export default function Board() {
     setGameOver(false); // okay?
     setWin(false);
     dispatch({ type: 'SHUFFLE', payload: realData.allData });
+    
 
     setNewGame(false);
   }, [newGame]);
+
+  // Get num wet days for score when newGame changes.
+  useEffect(() => {
+    const wetDays = realData.data.filter(item=>item.rain > 0);
+    if(wetDays) {
+      setNumWet(wetDays.length);
+    }
+
+   
+  }, [newGame, setNumWet, realData.data]);
 
   // timeout to hide splash set in handle lose game
   useEffect(() => {
     if (!showSplash) return;
 
     // Remove you lost splash after 2 seconds.
-    splashTimer.current = setTimeout(() => setShowSplash(false), 2000);
+    splashTimer.current = setTimeout(() => setShowSplash(false), 3000);
 
     // Clean up setTimeout.
     return function cleanup() {
@@ -94,17 +106,21 @@ export default function Board() {
   }, [showSplash, setShowSplash, splashTimer.current]);
 
   // Handle roll everytime a game ends.
-  // TODO: should also go back to zero if newGame changes while !gameOver
   useEffect(() => {
     if (!gameOver) return;
 
     // Add the number of wet days avoided in this round to the total score
     // DOING...
-    dispatch({ type: 'SCORE', payload: 0 });
+    const currentScore = Number(realData.score);
+    const updateScore = currentScore + (numWet *10); // more exciting.
 
-    // Game is lost, reset roll to 0.
+    if(isNaN(updateScore)) return; 
+    dispatch({ type: 'SCORE', payload: updateScore });
+
+    // Game is lost, reset roll & score to 0.
     if (gameOver && !win) {
       dispatch({ type: 'ROLL', payload: 0 });
+      dispatch({ type: 'SCORE', payload: 0 });
     }
 
     // Game is won.
@@ -128,7 +144,7 @@ export default function Board() {
         }
       };
     }
-  }, [win, gameOver, setIsRoundOne, isRoundOne]);
+  }, [win, gameOver]);
 
   // Reveal all tiles on game over.
   useEffect(() => {
@@ -238,7 +254,7 @@ export default function Board() {
 
   return (
     <View style={styles.boardWrap}>
-      {showSplash && win && <Splash win={win} roll={realData.roll} />}
+      {showSplash && win && <Splash numWet={numWet} win={win} roll={realData.roll} />}
       {showSplash && !win && (
         <Splash
           win={win}
@@ -250,6 +266,7 @@ export default function Board() {
 
       <GameInfo
         style={styles.gameInfo}
+        score={realData.score}
         gameOver={gameOver}
         setNewGame={setNewGame}
         newGame={newGame}
