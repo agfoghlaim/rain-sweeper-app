@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer, useRef } from 'react';
-import { View, StyleSheet, FlatList, Dimensions, Text } from 'react-native';
+import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 
 import GameInfo from './GameInfo';
 import Tile from './Tile';

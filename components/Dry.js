@@ -2,20 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
 import { colors } from '../consts';
 import Nasties from './Nasties';
+import Umbrella from './Unbrella';
 
-export default function DryTile({ itemData, handleDryClick, gameOver }) {
-  const [flagged, setFlagged] = useState(false);
+export default function DryTile({
+  itemData,
+  flagged,
+  setFlagged,
+  handleDryClick,
+  gameOver,
+}) {
 
-  const date = itemData.item.date;
-  
-  useEffect(() => {
-    if (!gameOver) return;
-    setFlagged(false);
-  }, [gameOver]);
+  // Destructure from itemData.item.
+  const {
+    item: { checked, date, numNastyNeighbours },
+  } = itemData;
 
   function localHandlePress() {
     if (gameOver) return;
-    if (itemData.item.checked) return;
+    if (checked) return;
     handleDryClick(itemData.item);
   }
   function handleLongPress() {
@@ -29,20 +33,17 @@ export default function DryTile({ itemData, handleDryClick, gameOver }) {
       underlayColor="#DDDDDD"
       style={{
         ...styles.dryTile,
-        backgroundColor: itemData.item.checked
-          ? `${colors.gray}`
-          : `${colors.white}`,
+        backgroundColor: checked ? `${colors.gray}` : `${colors.white}`,
       }}
       onPress={localHandlePress}
       onLongPress={handleLongPress}
     >
       <>
         <Text style={styles.date}>{date}</Text>
-        {itemData.item.checked && (
-          <Nasties numNastyNeighbours={itemData.item.numNastyNeighbours} />
-        )}
+        
+        {checked && <Nasties numNastyNeighbours={numNastyNeighbours} />}
 
-        {flagged && !itemData.item.checked && !gameOver && <Text>☂️</Text>}
+        {flagged && !checked && !gameOver && <Umbrella />}
       </>
     </TouchableHighlight>
   );
@@ -51,6 +52,7 @@ export default function DryTile({ itemData, handleDryClick, gameOver }) {
 const styles = StyleSheet.create({
   dryTile: {
     flex: 1,
+    overflow: 'hidden',
     height: (Dimensions.get('window').width - 7 - 16) / 8,
     margin: 1,
     borderRadius: 2,

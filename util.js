@@ -86,7 +86,7 @@ export function addNumNastyNeighboursToShuffledData(days) {
     });
 
     days[i].numNastyNeighbours = numNastyNeighbours;
-    days[i].id = i; // TODO fix this, need proper ids.
+    days[i].id = i; 
     //days[i].checked = false; // TODO fix this, move or change the name of this function which already has a really long name!.
   }
   return days;

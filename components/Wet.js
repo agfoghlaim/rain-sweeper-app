@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import { Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
 
+import Umbrella from './Unbrella';
+
 import { colors, NUM_DAYS_IN_ROW } from '../consts';
 
-export default function WetTile({ itemData, handleWetClick, gameOver }) {
-  const [flagged, setFlagged] = useState(false);
-  const date = itemData.item.date;
-  useEffect(()=>{
-    if(!gameOver) return;
-    setFlagged(false);
-  },[gameOver])
+export default function WetTile({
+  itemData,
+  flagged,
+  setFlagged,
+  handleWetClick,
+  gameOver,
+}) {
+  const {
+    item: { date, culprit },
+  } = itemData;
 
   function localHandlePress() {
     if (gameOver) return;
@@ -26,13 +31,16 @@ export default function WetTile({ itemData, handleWetClick, gameOver }) {
     <TouchableHighlight
       activeOpacity={0.6}
       underlayColor="#DDDDDD"
-      style={{...styles.wetTile, backgroundColor: itemData.item.culprit ? colors.red : colors.orange}}
+      style={{
+        ...styles.wetTile,
+        backgroundColor: culprit ? colors.red : colors.orange,
+      }}
       onPress={localHandlePress}
       onLongPress={handleLongPress}
     >
       <>
         <Text style={styles.date}>{date}</Text>
-        {flagged && !gameOver && <Text>☂️</Text>}
+        {flagged && !gameOver && <Umbrella />}
         {gameOver && <Text>🌧️</Text>}
       </>
     </TouchableHighlight>
@@ -50,7 +58,7 @@ const styles = StyleSheet.create({
     borderColor: colors.white,
     borderWidth: 2,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   date: {
