@@ -51,7 +51,7 @@ export default function DryTile({ itemData, handleDryClick, gameOver }) {
 const styles = StyleSheet.create({
   dryTile: {
     flex: 1,
-    height: (Dimensions.get('window').width - 7 - 16) / 8, // this is right for a square? find what padding/margin is involved
+    height: (Dimensions.get('window').width - 7 - 16) / 8,
     margin: 1,
     borderRadius: 2,
     shadowColor: colors.black,

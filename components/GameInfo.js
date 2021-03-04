@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Button, StyleSheet, Animated } from 'react-native';
 
 import { colors } from '../consts';
 
@@ -11,6 +11,28 @@ export default function GameInfo({
   win,
   roll,
 }) {
+  const initialScale = useState(new Animated.Value(1))[0];
+
+  function drawAttentionToNextRoundButton() {
+    Animated.loop(
+      Animated.spring(initialScale, {
+        toValue: 1.02,
+        friction: 1,
+        tension: 1,
+        duration: 3000,
+        useNativeDriver: true,
+      })
+    ).start();
+  }
+
+  useEffect(() => {
+    if (!gameOver) return;
+
+    if (win) {
+      drawAttentionToNextRoundButton();
+    }
+  }, [gameOver]);
+
   function decideEmoji() {
     if (gameOver && typeof newGame === 'undefined') {
       return '😴';
@@ -31,19 +53,27 @@ export default function GameInfo({
 
   return (
     <View style={styles.gameInfo}>
-
       <Text style={styles.score}>Score: {score}</Text>
       <Text style={{ fontSize: 32 }}> {decideEmoji()}</Text>
 
       {!gameOver ? (
         <Text style={styles.round}>Round: {roll + 1}</Text>
       ) : (
-        <Button
-          color={colors.black}
-          accessibilityLabel={win ? 'Next Round' : 'New Game'}
-          title={win ? 'Next Round' : 'New Game'}
-          onPress={() => setNewGame(true)}
-        />
+        <Animated.View
+          style={{
+            transform: [
+              { scale: initialScale },
+              { perspective: 1000 }, // react native docs says: without this line this Animation will not render on Android while working fine on iOS
+            ],
+          }}
+        >
+          <Button
+            color={colors.black}
+            accessibilityLabel={win ? 'Next Round' : 'New Game'}
+            title={win ? 'Next Round' : 'New Game'}
+            onPress={() => setNewGame(true)}
+          />
+        </Animated.View>
       )}
     </View>
   );
@@ -68,8 +98,8 @@ const styles = StyleSheet.create({
     color: colors.red,
     backgroundColor: colors.white,
     paddingVertical: 5,
-    paddingHorizontal:10,
-    borderRadius: 4
+    paddingHorizontal: 10,
+    borderRadius: 4,
   },
   round: {
     fontFamily: 'monospace',
@@ -78,7 +108,7 @@ const styles = StyleSheet.create({
     color: colors.white,
     backgroundColor: colors.red,
     paddingVertical: 5,
-    paddingHorizontal:10,
-    borderRadius: 4
-  }
+    paddingHorizontal: 10,
+    borderRadius: 4,
+  },
 });
