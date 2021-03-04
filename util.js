@@ -53,9 +53,12 @@ export async function fetchData() {
 
   // Shuffle the data.
   const allDataShuffled = shuffleArray(winnableData);
+  
+  // Format the dates.
+  const allDataWithNiceDates = formatDates(allDataShuffled);
 
   // Slice off gameData( .length === NUM_DAYS_IN_GAME )l
-  const gameData = allDataShuffled.slice(0, NUM_DAYS_IN_GAME);
+  const gameData = allDataWithNiceDates.slice(0, NUM_DAYS_IN_GAME);
 
   // Add .numNastyNeighbours to the gameData.
   const gameDataWithNumNasties = addNumNastyNeighboursToShuffledData(gameData);
@@ -155,14 +158,11 @@ export function getNeighbourToThe(i, direction) {
   return neighbours[direction];
 }
 
-export function sweeperDate(string) {
-  // string from api will be in format "05-mar-2010".
-  // function will return "5 Mar '10".
-  const d = new Date(string);
-  const year = d.getFullYear().toString().substring(2, 4); // "19"
-  const month = d.toLocaleString('default', { month: 'long' }).substring(4, 7); // "Jan"
-  const day = d.getDate();
-  return `${day} ${month} '${year}`;
+export function formatDates(arr) {
+  return arr.map(item=>{
+    item.date = sweeperDate(item.date);
+    return item;
+  })
 }
 
 export function setCheckedToFalse(arr) {
@@ -212,4 +212,13 @@ function isTop(num) {
 }
 function isBottom(num) {
   return num >= NUM_DAYS_IN_GAME - NUM_DAYS_IN_ROW;
+}
+function sweeperDate(string) {
+  // string from api will be in format "05-mar-2010".
+  // function will return "5 Mar '10".
+  const d = new Date(string);
+  const year = d.getFullYear().toString().substring(2, 4); // "19"
+  const month = d.toLocaleString('default', { month: 'long' }).substring(4, 7); // "Jan"
+  const day = d.getDate();
+  return `${day} ${month} '${year}`;
 }

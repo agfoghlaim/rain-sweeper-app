@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { sweeperDate } from '../util';
+
 import { Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
 
 import { colors, NUM_DAYS_IN_ROW } from '../consts';
 
 export default function WetTile({ itemData, handleWetClick, gameOver }) {
   const [flagged, setFlagged] = useState(false);
-  const date = sweeperDate(itemData.item.date);
-
+  const date = itemData.item.date;
   useEffect(()=>{
     if(!gameOver) return;
     setFlagged(false);

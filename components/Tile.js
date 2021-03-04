@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { sweeperDate } from '../util';
+
 
 import WetTile from './Wet';
 import DryTile from './Dry';
@@ -11,9 +11,9 @@ export default function Tile({
   handleWetClick,
 }) {
 
-  // maybe these should stay here?
+  // TODO: maybe these should stay here?
   const [flagged, setFlagged] = useState(false);
-  const date = sweeperDate(itemData.item.date);
+
 
   return itemData.item.rain === 0  ? (
     <DryTile

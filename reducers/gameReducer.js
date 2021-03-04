@@ -2,7 +2,7 @@ import {
   shuffleArray,
   addNumNastyNeighboursToShuffledData,
   setCheckedToFalse,
-  sliceNumDaysInAGameConst,
+  sliceNumDaysInAGameConst
 } from '../util';
 
 export default function gameReducer(state, action) {
@@ -25,6 +25,11 @@ export default function gameReducer(state, action) {
       return {
         ...state,
         roll: action.payload
+      };
+    case 'SCORE':
+      return {
+        ...state,
+        score: action.payload
       };
     case 'CULPRIT':
       return {

@@ -37,6 +37,7 @@ export default function Board() {
 
   const initialState = {
     roll: 0,
+    score: 0,
     loading: true,
     error: '',
     culprit: null,
@@ -96,6 +97,10 @@ export default function Board() {
   // TODO: should also go back to zero if newGame changes while !gameOver
   useEffect(() => {
     if (!gameOver) return;
+
+    // Add the number of wet days avoided in this round to the total score
+    // DOING...
+    dispatch({ type: 'SCORE', payload: 0 });
 
     // Game is lost, reset roll to 0.
     if (gameOver && !win) {

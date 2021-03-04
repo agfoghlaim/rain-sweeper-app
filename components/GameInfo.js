@@ -18,10 +18,10 @@ export default function GameInfo({ gameOver, newGame, setNewGame, win, roll }) {
     ) {
       return '😒';
     } else {
-      return '>';
+      return '';
     }
   }
-  
+
   return (
     <View style={styles.gameInfo}>
       <Text style={{ fontSize: 32 }}> {decideEmoji()}</Text>

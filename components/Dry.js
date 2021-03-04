@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { sweeperDate } from '../util';
 import { Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
 import { colors } from '../consts';
 import Nasties from './Nasties';
 
 export default function DryTile({ itemData, handleDryClick, gameOver }) {
   const [flagged, setFlagged] = useState(false);
-  const date = sweeperDate(itemData.item.date);
 
+  const date = itemData.item.date;
+  
   useEffect(() => {
     if (!gameOver) return;
     setFlagged(false);
