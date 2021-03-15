@@ -12,13 +12,24 @@ export default function WetTile({
   setFlagged,
   handleWetClick,
   gameOver,
+  numLives,
+  setNumLives
 }) {
+
+  // Destructure from itemData.item.
   const {
     item: { date, culprit },
   } = itemData;
 
   function localHandlePress() {
     if (gameOver) return;
+    let currentLives = numLives;
+    if(currentLives > 0 ) {
+      const update = currentLives - 1;
+      setNumLives(update);
+      setFlagged(true);
+      return;
+    }
     handleWetClick(itemData.item);
   }
 
@@ -33,7 +44,7 @@ export default function WetTile({
       underlayColor="#DDDDDD"
       style={{
         ...styles.wetTile,
-        backgroundColor: culprit ? colors.red : colors.orange,
+        backgroundColor: culprit ? colors.red : colors.white,
       }}
       onPress={localHandlePress}
       onLongPress={handleLongPress}
@@ -55,7 +66,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     shadowColor: colors.black,
     elevation: 10,
-    borderColor: colors.white,
+    borderColor: colors.red,
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',

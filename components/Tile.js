@@ -9,6 +9,8 @@ export default function Tile({
   gameOver,
   handleDryClick,
   handleWetClick,
+  numLives,
+  setNumLives
 }) {
 
   // TODO: maybe these should stay here?
@@ -26,6 +28,7 @@ export default function Tile({
     gameOver={gameOver}
     setFlagged={setFlagged}
     flagged={flagged}
+
     />
   ) : (
     <WetTile
@@ -34,6 +37,8 @@ export default function Tile({
       gameOver={gameOver}
       setFlagged={setFlagged}
       flagged={flagged}
+      numLives={numLives}
+      setNumLives={setNumLives}
     />
   );
 

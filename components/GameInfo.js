@@ -10,9 +10,17 @@ export default function GameInfo({
   setNewGame,
   win,
   roll,
+  numLives,
+  error
 }) {
   const initialScale = useState(new Animated.Value(1))[0];
 
+  function handleSetNewGame() {
+    // don't do anything if the data didn't load properly.
+    if(!error){
+      setNewGame(true)
+    }
+  }
   function drawAttentionToNextRoundButton() {
     Animated.loop(
       Animated.spring(initialScale, {
@@ -57,7 +65,14 @@ export default function GameInfo({
       <Text style={{ fontSize: 32 }}> {decideEmoji()}</Text>
 
       {!gameOver ? (
-        <Text style={styles.round}>Round: {roll + 1}</Text>
+        <>
+          <Text style={styles.umbrellas}>
+            {numLives < 4
+              ? Array.from(Array(numLives)).map((_, i) => '🌂')
+              : `🌂 x ${numLives}`}
+          </Text>
+          <Text style={styles.round}>Round: {roll + 1}</Text>
+        </>
       ) : (
         <Animated.View
           style={{
@@ -71,7 +86,7 @@ export default function GameInfo({
             color={colors.black}
             accessibilityLabel={win ? 'Next Round' : 'New Game'}
             title={win ? 'Next Round' : 'New Game'}
-            onPress={() => setNewGame(true)}
+            onPress={handleSetNewGame}
           />
         </Animated.View>
       )}

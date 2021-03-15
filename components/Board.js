@@ -48,6 +48,7 @@ export default function Board() {
   const [realData, dispatch] = useReducer(gameReducer, initialState);
   const [newGame, setNewGame] = useState(undefined);
   const [gameOver, setGameOver] = useState(true);
+  const [numLives, setNumLives] = useState(3); // it's reset anyway...
   const [win, setWin] = useState(undefined);
   const [showSplash, setShowSplash] = useState(false);
   const splashTimer = useRef(null);
@@ -59,6 +60,7 @@ export default function Board() {
       try {
         const allData = await fetchData();
         dispatch({ type: 'FETCH', error: '', payload: allData });
+        //dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
       } catch (err) {
         console.log(err);
         dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
@@ -85,7 +87,7 @@ export default function Board() {
     if(wetDays) {
       setNumWet(wetDays.length);
     }
-
+    
    
   }, [newGame, setNumWet, realData.data]);
 
@@ -117,10 +119,11 @@ export default function Board() {
     if(isNaN(updateScore)) return; 
     dispatch({ type: 'SCORE', payload: updateScore });
 
-    // Game is lost, reset roll & score to 0.
+    // Game is lost, reset roll & score to 0, numLives to 3.
     if (gameOver && !win) {
       dispatch({ type: 'ROLL', payload: 0 });
       dispatch({ type: 'SCORE', payload: 0 });
+      setNumLives(3);
     }
 
     // Game is won.
@@ -136,6 +139,19 @@ export default function Board() {
       splashTimer.current = setTimeout(() => {
         setShowSplash(false);
       }, 1500);
+     
+      // 4. get one spare umbrella on fifth round
+      if( roll === 4) {
+  
+        let currentLives = numLives;
+        setNumLives(currentLives + 1);
+
+      // 5. get two spare umbrellas every 10 rounds.
+      }else if(roll > 0 && roll % 9 === 0){
+        let currentLives = numLives;
+        setNumLives(currentLives + 2);
+      }
+      
 
       // Clean up timeout.
       return function cleanup() {
@@ -174,11 +190,19 @@ export default function Board() {
         handleWetClick={handleWetClick}
         handleDryClick={handleDryClick}
         gameOver={gameOver}
+        numLives={numLives}
+        setNumLives={setNumLives}
       />
     );
   }
 
   function handleWetClick(data) {
+    // let currentLives = numLives;
+    // if(currentLives > 1 ) {
+    //   const update = currentLives - 1;
+    //   setNumLives(update);
+    //   return;
+    // }
     setGameOver(true);
 
     // Set which day done it.
@@ -272,6 +296,8 @@ export default function Board() {
         newGame={newGame}
         win={win}
         roll={realData.roll}
+        numLives={numLives}
+        error={realData.error}
       />
 
       <View style={styles.board}>
