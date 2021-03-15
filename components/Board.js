@@ -60,7 +60,6 @@ export default function Board() {
       try {
         const allData = await fetchData();
         dispatch({ type: 'FETCH', error: '', payload: allData });
-        //dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
       } catch (err) {
         console.log(err);
         dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
