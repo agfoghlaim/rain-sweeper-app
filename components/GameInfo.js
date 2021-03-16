@@ -11,16 +11,11 @@ export default function GameInfo({
   win,
   roll,
   numLives,
-  error
+  error,
+  loading,
 }) {
   const initialScale = useState(new Animated.Value(1))[0];
 
-  function handleSetNewGame() {
-    // don't do anything if the data didn't load properly.
-    if(!error){
-      setNewGame(true)
-    }
-  }
   function drawAttentionToNextRoundButton() {
     Animated.loop(
       Animated.spring(initialScale, {
@@ -85,8 +80,9 @@ export default function GameInfo({
           <Button
             color={colors.black}
             accessibilityLabel={win ? 'Next Round' : 'New Game'}
+            disabled={Boolean(error) || loading}
             title={win ? 'Next Round' : 'New Game'}
-            onPress={handleSetNewGame}
+            onPress={() => setNewGame(true)}
           />
         </Animated.View>
       )}

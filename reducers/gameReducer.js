@@ -2,7 +2,7 @@ import {
   shuffleArray,
   addNumNastyNeighboursToShuffledData,
   setCheckedToFalse,
-  sliceNumDaysInAGameConst
+  sliceNumDaysInAGameConst,
 } from '../util';
 
 export default function gameReducer(state, action) {
@@ -14,7 +14,7 @@ export default function gameReducer(state, action) {
         roll: 0,
         data: action.payload.gameData,
         allData: action.payload.allData,
-        score: 0
+        score: 0,
       };
     case 'FETCH_ERROR':
       return {
@@ -22,20 +22,26 @@ export default function gameReducer(state, action) {
         loading: false,
         error: action.error,
       };
+    case 'FETCHING':
+      return {
+        ...state,
+        loading: action.loading,
+        error: action.error,
+      };
     case 'ROLL':
       return {
         ...state,
-        roll: action.payload
+        roll: action.payload,
       };
     case 'SCORE':
       return {
         ...state,
-        score: action.payload
+        score: action.payload,
       };
     case 'CULPRIT':
       return {
         ...state,
-        culprit: action.payload
+        culprit: action.payload,
       };
     case 'SHUFFLE':
       // payload is allData, do the following 4 things to it & return some gameData.

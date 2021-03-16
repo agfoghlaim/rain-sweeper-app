@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useReducer, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  useRef,
+} from 'react';
 import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 
 import GameInfo from './GameInfo';
@@ -54,18 +60,25 @@ export default function Board() {
   const splashTimer = useRef(null);
   const [numWet, setNumWet] = useState(null);
 
+  const go = useCallback(async function load() {
+    try {
+      const allData = await fetchData();
+      dispatch({ type: 'FETCH', error: '', payload: allData });
+    } catch (err) {
+      console.log(err);
+      dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
+    }
+  }, []);
+
+  // Fetch data manually. In the case of no internet when the app loads, this can be called from the error component.
+  function tryAgain() {
+    dispatch({ type: 'FETCHING', error: '', loading: true });
+    go();
+  }
+
   // Fetch data on load
   useEffect(() => {
-    async function go() {
-      try {
-        const allData = await fetchData();
-        dispatch({ type: 'FETCH', error: '', payload: allData });
-      } catch (err) {
-        console.log(err);
-        dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
-      }
-    }
-  
+    dispatch({ type: 'FETCHING', error: '', loading: true });
     go();
   }, []);
 
@@ -75,19 +88,16 @@ export default function Board() {
     setGameOver(false); // okay?
     setWin(false);
     dispatch({ type: 'SHUFFLE', payload: realData.allData });
-    
 
     setNewGame(false);
   }, [newGame]);
 
   // Get num wet days for score when newGame changes.
   useEffect(() => {
-    const wetDays = realData.data.filter(item=>item.rain > 0);
-    if(wetDays) {
+    const wetDays = realData.data.filter((item) => item.rain > 0);
+    if (wetDays) {
       setNumWet(wetDays.length);
     }
-    
-   
   }, [newGame, setNumWet, realData.data]);
 
   // timeout to hide splash set in handle lose game
@@ -113,9 +123,9 @@ export default function Board() {
     // Add the number of wet days avoided in this round to the total score
     // DOING...
     const currentScore = Number(realData.score);
-    const updateScore = currentScore + (numWet *10); // more exciting.
+    const updateScore = currentScore + numWet * 10; // more exciting.
 
-    if(isNaN(updateScore)) return; 
+    if (isNaN(updateScore)) return;
     dispatch({ type: 'SCORE', payload: updateScore });
 
     // Game is lost, reset roll & score to 0, numLives to 3.
@@ -138,19 +148,17 @@ export default function Board() {
       splashTimer.current = setTimeout(() => {
         setShowSplash(false);
       }, 1500);
-     
+
       // 4. get one spare umbrella on fifth round
-      if( roll === 4) {
-  
+      if (roll === 4) {
         let currentLives = numLives;
         setNumLives(currentLives + 1);
 
-      // 5. get two spare umbrellas every 10 rounds.
-      }else if(roll > 0 && roll % 9 === 0){
+        // 5. get two spare umbrellas every 10 rounds.
+      } else if (roll > 0 && roll % 9 === 0) {
         let currentLives = numLives;
         setNumLives(currentLives + 2);
       }
-      
 
       // Clean up timeout.
       return function cleanup() {
@@ -277,7 +285,9 @@ export default function Board() {
 
   return (
     <View style={styles.boardWrap}>
-      {showSplash && win && <Splash numWet={numWet} win={win} roll={realData.roll} />}
+      {showSplash && win && (
+        <Splash numWet={numWet} win={win} roll={realData.roll} />
+      )}
       {showSplash && !win && (
         <Splash
           win={win}
@@ -297,6 +307,7 @@ export default function Board() {
         roll={realData.roll}
         numLives={numLives}
         error={realData.error}
+        loading={realData.loading}
       />
 
       <View style={styles.board}>
@@ -311,7 +322,7 @@ export default function Board() {
             key={(item) => item.date}
           />
         ) : !realData.loading && realData.error !== '' ? (
-          <Error msg={realData.error} />
+          <Error msg={realData.error} tryAgain={tryAgain} />
         ) : realData.loading ? (
           <Loading />
         ) : null}

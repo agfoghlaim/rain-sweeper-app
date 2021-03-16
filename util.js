@@ -53,7 +53,7 @@ export async function fetchData() {
 
   // Shuffle the data.
   const allDataShuffled = shuffleArray(winnableData);
-  
+
   // Format the dates.
   const allDataWithNiceDates = formatDates(allDataShuffled);
 
@@ -86,7 +86,7 @@ export function addNumNastyNeighboursToShuffledData(days) {
     });
 
     days[i].numNastyNeighbours = numNastyNeighbours;
-    days[i].id = i; 
+    days[i].id = i;
     //days[i].checked = false; // TODO fix this, move or change the name of this function which already has a really long name!.
   }
   return days;
@@ -159,10 +159,10 @@ export function getNeighbourToThe(i, direction) {
 }
 
 export function formatDates(arr) {
-  return arr.map(item=>{
+  return arr.map((item) => {
     item.date = sweeperDate(item.date);
     return item;
-  })
+  });
 }
 
 export function setCheckedToFalse(arr) {
