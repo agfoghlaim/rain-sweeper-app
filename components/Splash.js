@@ -1,23 +1,39 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions, Text } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, Button } from 'react-native';
 import { colors } from '../consts';
 
-export default function Splash({ win, numWet, rain, date, roll }) {
-   let msg = '';
-   if( roll === 4) {
-  
-    msg = '😎🌂'
+export default function Splash({
+  win,
+  numWet,
+  rain,
+  date,
+  roll,
+  setShowSplash,
+  setNewGame,
+}) {
+  function localHandleDismissSplash() {
+    setShowSplash(false);
+    setNewGame(true);
+  }
 
-  // 5. get two spare umbrellas every 10 rounds.
-  }else if(roll > 0 && roll % 10 === 0){
-    msg ='😎🌂🌂'
+  let msg = '';
+  if (roll === 4) {
+    msg = '😎🌂';
+
+    // 5. get two spare umbrellas every 10 rounds.
+  } else if (roll > 0 && roll % 10 === 0) {
+    msg = '😎🌂🌂';
   }
 
   return win ? (
     <View style={styles.splash}>
       <Text style={styles.emoji}>{msg === '' ? '😎' : msg}</Text>
       <Text style={styles.text2}>You avoided {numWet} rainy days</Text>
-      
+      <Button
+        color={colors.orange}
+        onPress={localHandleDismissSplash}
+        title="Keep Going"
+      />
     </View>
   ) : (
     <View style={styles.splash}>
@@ -42,6 +58,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   text1: { color: 'white', fontSize: 32, fontWeight: 'bold' },
-  text2: { color: colors.orange, fontSize: 16, fontWeight: 'bold' },
+  text2: {
+    color: colors.orange,
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
   emoji: { fontSize: 32, margin: 20 },
 });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Button, StyleSheet, Animated } from 'react-native';
 
 import { colors } from '../consts';
@@ -35,20 +35,62 @@ export default function GameInfo({
       drawAttentionToNextRoundButton();
     }
   }, [gameOver]);
+  //////////////////////////
+  const lives = useRef(numLives);
+  const [emoji, setEmoji] = useState({ emoji: '🤔', desc: 'thinking emoji' });
+  useEffect(() => {
+    if (!numLives) return;
+    if (numLives < lives.current) {
+      setEmoji({ emoji: '🙄', desc: 'eyeroll emoji' });
+
+      const timer = setTimeout(
+        () => setEmoji({ emoji: '🤔', desc: 'thinking emoji' }),
+        300
+      );
+
+      // Clean up setTimeout.
+      return function cleanup() {
+        if (timer) {
+          clearTimeout(timer);
+        }
+      };
+    }
+  }, [numLives, lives]);
+  ////////////////////////////////
+  // function decideEmoji() {
+  //   if (gameOver && typeof newGame === 'undefined') {
+  //     return '😴';
+  //   } else if (!gameOver && typeof newGame === 'boolean') {
+  //     return '🤔';
+  //   } else if (win && gameOver && typeof newGame === 'boolean') {
+  //     return '😀';
+  //   } else if (
+  //     typeof newGame === 'boolean' &&
+  //     typeof win === 'boolean' &&
+  //     gameOver
+  //   ) {
+  //     return '😒';
+  //   } else {
+  //     return '';
+  //   }
+  // }
 
   function decideEmoji() {
     if (gameOver && typeof newGame === 'undefined') {
-      return '😴';
+      return {
+        emoji: '😴',
+        desc: 'sleeping emoji',
+      };
     } else if (!gameOver && typeof newGame === 'boolean') {
-      return '🤔';
+      return emoji;
     } else if (win && gameOver && typeof newGame === 'boolean') {
-      return '😀';
+      return { emoji: '😀', desc: 'grinning emoji' };
     } else if (
       typeof newGame === 'boolean' &&
       typeof win === 'boolean' &&
       gameOver
     ) {
-      return '😒';
+      return { emoji: '😒', desc: 'sad emoji' };
     } else {
       return '';
     }
@@ -57,14 +99,18 @@ export default function GameInfo({
   return (
     <View style={styles.gameInfo}>
       <Text style={styles.score}>Score: {score}</Text>
-      <Text style={{ fontSize: 32 }}> {decideEmoji()}</Text>
+      <Text style={{ fontSize: 32 }}> {decideEmoji().emoji}</Text>
 
       {!gameOver ? (
         <>
           <Text style={styles.umbrellas}>
-            {numLives < 4
+            {numLives < 4 && numLives > 0
               ? Array.from(Array(numLives)).map((_, i) => '🌂')
-              : `🌂 x ${numLives}`}
+              : numLives === 0
+              ? '⚠️'
+              : numLives
+              ? `🌂 x ${numLives}`
+              : ''}
           </Text>
           <Text style={styles.round}>Round: {roll + 1}</Text>
         </>
@@ -82,7 +128,9 @@ export default function GameInfo({
             accessibilityLabel={win ? 'Next Round' : 'New Game'}
             disabled={Boolean(error) || loading}
             title={win ? 'Next Round' : 'New Game'}
-            onPress={() => setNewGame(true)}
+            onPress={() => {
+              setNewGame(true);
+            }}
           />
         </Animated.View>
       )}

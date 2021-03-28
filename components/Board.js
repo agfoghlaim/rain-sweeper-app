@@ -13,10 +13,10 @@ import Loading from './Loading';
 import Error from './Error';
 import Splash from './Splash';
 import {
+  prepData,
   fetchData,
   shouldCheckInThisDirection,
   getNeighbourToThe,
-  setCheckedToTrue,
   checkGameOver,
   setCulprit,
 } from '../util';
@@ -49,21 +49,25 @@ export default function Board() {
     culprit: null,
     allData: [], // all data shuffled & with numNastyNeighbours- ratio is 1:5 wet:dry
     data: [], // game data, .length === NUM_DAYS_IN_GAME
+    numWet: undefined,
+    numLives: 3,
   };
 
   const [realData, dispatch] = useReducer(gameReducer, initialState);
   const [newGame, setNewGame] = useState(undefined);
   const [gameOver, setGameOver] = useState(true);
-  const [numLives, setNumLives] = useState(3); // it's reset anyway...
+
   const [win, setWin] = useState(undefined);
   const [showSplash, setShowSplash] = useState(false);
   const splashTimer = useRef(null);
-  const [numWet, setNumWet] = useState(null);
-
+  const [betweenRounds, setBetweenRounds] = useState(false);
+  // const [numWet, setNumWet] = useState(null);
+  const { numWet, numLives } = realData;
   const go = useCallback(async function load() {
     try {
       const allData = await fetchData();
-      dispatch({ type: 'FETCH', error: '', payload: allData });
+
+      dispatch({ type: 'SET_FETCHED_DATA', error: '', payload: allData });
     } catch (err) {
       console.log(err);
       dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
@@ -82,29 +86,38 @@ export default function Board() {
     go();
   }, []);
 
-  // Shuffle when newGame changes.
+  // Starting new round (or new Game)
   useEffect(() => {
     if (!newGame) return;
-    setGameOver(false); // okay?
+
+    setGameOver(false);
     setWin(false);
-    dispatch({ type: 'SHUFFLE', payload: realData.allData });
-
+    dispatch({ type: 'SHUFFLE' });
+    dispatch({ type: 'CALC_WET_DAYS' });
     setNewGame(false);
-  }, [newGame]);
+  }, [newGame, setWin]);
 
-  // Get num wet days for score when newGame changes.
+  // Starting New Game (not just new round)
   useEffect(() => {
-    const wetDays = realData.data.filter((item) => item.rain > 0);
-    if (wetDays) {
-      setNumWet(wetDays.length);
-    }
-  }, [newGame, setNumWet, realData.data]);
+    /*
+    win === undefined means first round
+    win === true means new round
+    win === false means new Game/new round
+    */
 
-  // timeout to hide splash set in handle lose game
+    if (!newGame) return;
+
+    if (win) return;
+    dispatch({ type: 'RESET_ROLL' });
+    dispatch({ type: 'RESET SCORE' });
+    dispatch({ type: 'NUM_LIVES', payload: 3 });
+  }, [newGame, setWin, win]);
+
+  // timeout to hide splash set in handle LOSE game
   useEffect(() => {
-    if (!showSplash) return;
+    if (!showSplash || win) return;
 
-    // Remove you lost splash after 2 seconds.
+    // Remove you lost splash after 3 seconds.
     splashTimer.current = setTimeout(() => setShowSplash(false), 3000);
 
     // Clean up setTimeout.
@@ -114,68 +127,43 @@ export default function Board() {
         splashTimer.current = null;
       }
     };
-  }, [showSplash, setShowSplash, splashTimer.current]);
+  }, [showSplash, setShowSplash, win]);
 
-  // Handle roll everytime a game ends.
+  // Between Rounds.
   useEffect(() => {
+    if (!betweenRounds) return;
     if (!gameOver) return;
+    if (!win) return;
 
-    // Add the number of wet days avoided in this round to the total score
-    // DOING...
-    const currentScore = Number(realData.score);
-    const updateScore = currentScore + numWet * 10; // more exciting.
+    // 1. Update numLives (for round 5 & %10 === 0)
+    dispatch({ type: 'UPDATE_NUM_LIVES' });
 
-    if (isNaN(updateScore)) return;
-    dispatch({ type: 'SCORE', payload: updateScore });
+    // 2. Increment round.
+    dispatch({ type: 'INCREMENT_ROLL' });
 
-    // Game is lost, reset roll & score to 0, numLives to 3.
-    if (gameOver && !win) {
-      dispatch({ type: 'ROLL', payload: 0 });
-      dispatch({ type: 'SCORE', payload: 0 });
-      setNumLives(3);
-    }
+    // 3. Increment score.
+    dispatch({ type: 'SCORE', numWet });
 
-    // Game is won.
-    if (gameOver && win) {
-      // 1. Increment roll
-      const roll = realData.roll;
-      dispatch({ type: 'ROLL', payload: roll + 1 });
+    // 4. Show 'between rounds' splash.
+    setShowSplash(true);
 
-      //  2. Show 'X in a row' splash.
-      setShowSplash(true);
+    // 5. Stop this from happening more than once between every round.
+    setBetweenRounds(false);
 
-      // 3. Set timesout to remove splash.
-      splashTimer.current = setTimeout(() => {
-        setShowSplash(false);
-      }, 1500);
-
-      // 4. get one spare umbrella on fifth round
-      if (roll === 4) {
-        let currentLives = numLives;
-        setNumLives(currentLives + 1);
-
-        // 5. get two spare umbrellas every 10 rounds.
-      } else if (roll > 0 && roll % 9 === 0) {
-        let currentLives = numLives;
-        setNumLives(currentLives + 2);
+    // Clean up timeout.
+    return function cleanup() {
+      if (splashTimer.current) {
+        clearTimeout(splashTimer.current);
       }
-
-      // Clean up timeout.
-      return function cleanup() {
-        if (splashTimer.current) {
-          clearTimeout(splashTimer.current);
-        }
-      };
-    }
-  }, [win, gameOver]);
+    };
+  }, [betweenRounds, gameOver, win, setShowSplash, setBetweenRounds, numWet]);
 
   // Reveal all tiles on game over.
   useEffect(() => {
     if (!gameOver) return;
 
     // Reveal all tiles by setting all realData.data.checked = true.
-    const revealed = setCheckedToTrue(realData.data);
-    dispatch({ type: 'REVEAL_ALL', payload: revealed });
+    dispatch({ type: 'REVEAL_ALL' });
   }, [gameOver]);
 
   // Check if game should be over. This is for successful scenario. <Wet/> sets setGame(false) if a rainy day is clicked.
@@ -187,39 +175,25 @@ export default function Board() {
     if (isGameOver) {
       setGameOver(true);
       setWin(true);
+      setBetweenRounds(true);
     }
   }, [setGameOver, gameOver, realData.data, setWin]);
 
-  function renderTile(itemData) {
-    return (
-      <Tile
-        itemData={itemData}
-        handleWetClick={handleWetClick}
-        handleDryClick={handleDryClick}
-        gameOver={gameOver}
-        numLives={numLives}
-        setNumLives={setNumLives}
-      />
-    );
-  }
+  //#endregion
 
+  //#region handlers
   function handleWetClick(data) {
-    // let currentLives = numLives;
-    // if(currentLives > 1 ) {
-    //   const update = currentLives - 1;
-    //   setNumLives(update);
-    //   return;
-    // }
+    // This function only gets called when numLives === 0 so setGameOver immediately.
     setGameOver(true);
 
     // Set which day done it.
     const badDay = data.id;
 
-    // Map data and add a .culprit = true to the day that lost the game.
-    const updated = setCulprit(realData.data, badDay);
-
     // Show splash. 'Game Over' splash will show because win has not been set to true.
     setShowSplash(true);
+
+    // Map data and add a .culprit = true to the day that lost the game.
+    const updated = setCulprit(realData.data, badDay);
 
     // Update state. Set realData.data[badDay].culprit = true.
     dispatch({ type: 'CHECK_TILE', payload: updated });
@@ -282,18 +256,38 @@ export default function Board() {
       }
     }
   }
+  //#endregion handlers
+  function renderTiles(data) {
+    return (
+      <Tile
+        key={data.id}
+        itemData={data.item}
+        handleWetClick={handleWetClick}
+        handleDryClick={handleDryClick}
+        gameOver={gameOver}
+        numLives={numLives}
+        setNumLives={(pay) => dispatch({ type: 'NUM_LIVES', payload: pay })}
+      />
+    );
+  }
 
   return (
     <View style={styles.boardWrap}>
       {showSplash && win && (
-        <Splash numWet={numWet} win={win} roll={realData.roll} />
+        <Splash
+          numWet={numWet}
+          win={win}
+          roll={realData.roll}
+          setShowSplash={setShowSplash}
+          setNewGame={setNewGame}
+        />
       )}
       {showSplash && !win && (
         <Splash
           win={win}
           roll={realData.roll}
-          rain={realData.data[realData.culprit].rain}
-          date={realData.data[realData.culprit].date}
+          rain={realData?.data[realData.culprit]?.rain}
+          date={realData?.data[realData.culprit]?.date}
         />
       )}
 
@@ -317,7 +311,7 @@ export default function Board() {
           <FlatList
             style={styles.boardBg}
             data={realData.data.slice(0, NUM_DAYS_IN_GAME)}
-            renderItem={renderTile}
+            renderItem={renderTiles}
             numColumns={NUM_DAYS_IN_ROW}
             key={(item) => item.date}
           />

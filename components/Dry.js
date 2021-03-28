@@ -13,14 +13,14 @@ export default function DryTile({
 }) {
 
   // Destructure from itemData.item.
-  const {
-    item: { checked, date, numNastyNeighbours },
-  } = itemData;
-
+  // const {
+  //   item: { checked, date, numNastyNeighbours },
+  // } = itemData;
+const { checked, date, numNastyNeighbours } = itemData;
   function localHandlePress() {
     if (gameOver) return;
     if (checked) return;
-    handleDryClick(itemData.item);
+    handleDryClick(itemData);
   }
   function handleLongPress() {
     if (gameOver) return;

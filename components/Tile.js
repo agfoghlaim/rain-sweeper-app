@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-
+import { Text } from 'react-native';
 import WetTile from './Wet';
 import DryTile from './Dry';
 
@@ -13,6 +13,7 @@ export default function Tile({
   setNumLives
 }) {
 
+
   // TODO: maybe these should stay here?
   const [flagged, setFlagged] = useState(false);
 
@@ -21,7 +22,11 @@ export default function Tile({
     setFlagged(false);
   }, [gameOver, flagged]);
   
-  return itemData.item.rain === 0  ? (
+  // itemData.item is undefined
+  
+  return( 
+
+    itemData.rain === 0  ? (
     <DryTile
     itemData={itemData}
     handleDryClick={handleDryClick}
@@ -40,6 +45,7 @@ export default function Tile({
       numLives={numLives}
       setNumLives={setNumLives}
     />
+  )
   );
 
 }

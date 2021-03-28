@@ -2,12 +2,14 @@ import {
   shuffleArray,
   addNumNastyNeighboursToShuffledData,
   setCheckedToFalse,
+  setCheckedToTrue,
   sliceNumDaysInAGameConst,
 } from '../util';
 
 export default function gameReducer(state, action) {
+
   switch (action.type) {
-    case 'FETCH':
+    case 'SET_FETCHED_DATA':
       return {
         loading: false,
         error: '',
@@ -15,6 +17,7 @@ export default function gameReducer(state, action) {
         data: action.payload.gameData,
         allData: action.payload.allData,
         score: 0,
+        numWet: 0,
       };
     case 'FETCH_ERROR':
       return {
@@ -28,15 +31,35 @@ export default function gameReducer(state, action) {
         loading: action.loading,
         error: action.error,
       };
-    case 'ROLL':
+    case 'RESET_ROLL':
       return {
         ...state,
-        roll: action.payload,
+        roll: 0,
+      };
+    case 'CALC_WET_DAYS':
+      const wetDays = state.data.filter((item) => item.rain > 0);
+
+      return {
+        ...state,
+        numWet: wetDays.length || 0,
+      };
+    case 'INCREMENT_ROLL':
+      return {
+        ...state,
+        roll: state.roll + 1,
+      };
+
+    case 'RESET SCORE':
+      return {
+        ...state,
+        score: 0,
       };
     case 'SCORE':
+      const currentScore = Number(state.score);
+      const updateScore = currentScore + action.numWet * 10; // more exciting.
       return {
         ...state,
-        score: action.payload,
+        score: updateScore,
       };
     case 'CULPRIT':
       return {
@@ -44,8 +67,9 @@ export default function gameReducer(state, action) {
         culprit: action.payload,
       };
     case 'SHUFFLE':
+
       // payload is allData, do the following 4 things to it & return some gameData.
-      const { payload } = action;
+      // const { payload } = action;
       const gameData = [
         // 1. shuffle allData,
         shuffleArray,
@@ -60,7 +84,7 @@ export default function gameReducer(state, action) {
         addNumNastyNeighboursToShuffledData,
       ].reduce((payload, fn) => {
         return fn(payload);
-      }, payload);
+      }, state.allData);
 
       return {
         ...state,
@@ -73,9 +97,31 @@ export default function gameReducer(state, action) {
         data: action.payload,
       };
     case 'REVEAL_ALL':
+      const revealed = setCheckedToTrue(state.data);
       return {
         ...state,
-        data: action.payload,
+        data: revealed,
+      };
+    case 'NUM_LIVES':
+      return {
+        ...state,
+        numLives: action.payload,
+      };
+    case 'UPDATE_NUM_LIVES':
+      function calcNumLives() {
+        if (state.roll === 4) {
+          return 1;
+        } else if (state.roll > 0 && state.roll % 9 === 0) {
+          return 2;
+        }else{
+          return 0;
+        }
+      }
+      const inc= calcNumLives();
+   
+      return {
+        ...state,
+        numLives: state.numLives + inc,
       };
 
     default:
