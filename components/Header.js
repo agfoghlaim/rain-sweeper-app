@@ -25,7 +25,8 @@ const styles = StyleSheet.create({
 	headerText: {
 		color: colors.black,
 		fontSize: 18,
-		fontWeight: '700',
-		letterSpacing: 0.75,
+		fontWeight: '600',
+		letterSpacing: 2,
+		fontFamily: 'monospace',
 	}
 });

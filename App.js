@@ -7,7 +7,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Header title="Galway RainSweeper" />
-      <GameScreen/>
+      <GameScreen />
     </View>
   );
 }
@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    alignContent: 'center'
-  }
-
+    alignContent: 'center',
+  },
 });

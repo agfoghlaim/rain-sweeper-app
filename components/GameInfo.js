@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   score: {
     fontFamily: 'monospace',
-    fontWeight: '700',
+    fontWeight: '600',
     fontSize: 14,
     color: colors.red,
     backgroundColor: colors.white,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   },
   round: {
     fontFamily: 'monospace',
-    fontWeight: '700',
+    fontWeight: '600',
     fontSize: 14,
     color: colors.white,
     backgroundColor: colors.red,
