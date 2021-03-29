@@ -15,7 +15,7 @@ export default function Header({title}) {
 
 const styles = StyleSheet.create({
 	header: {
-		backgroundColor:colors.orange,
+		backgroundColor:colors.black,
 		height: 96,
 		width: '100%',
 		paddingTop: 48,
@@ -23,10 +23,12 @@ const styles = StyleSheet.create({
 		justifyContent: 'center'
 	},
 	headerText: {
-		color: colors.black,
-		fontSize: 18,
-		fontWeight: '600',
-		letterSpacing: 2,
+		color: colors.white,
+		fontSize: 16,
+		fontWeight: '700',
+		letterSpacing: 1,
+
+		textTransform: 'uppercase',
 		fontFamily: 'monospace',
 	}
 });

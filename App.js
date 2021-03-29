@@ -6,7 +6,7 @@ import Header from './components/Header';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Header title="Galway RainSweeper" />
+      <Header title="Irish Rain Sweeper" />
       <GameScreen />
     </View>
   );
