@@ -24,3 +24,31 @@ export const DIRECTIONS = [
 
 export const NUM_DAYS_IN_ROW = 8;
 export const NUM_DAYS_IN_GAME = 64;
+
+export const STATIONS = [
+  { name: 'ATHENRY', displayName: 'Athenry' },
+  { name: 'BALLYHAISE', displayName: 'Ballyhaise' },
+  { name: 'BELMULLET', displayName: 'Belmullet' },
+  { name: 'CASEMENT', displayName: 'Casement' },
+  { name: 'CLAREMORRIS', displayName: 'Claremorris' },
+  { name: 'CORK', displayName: 'Cork' },
+  { name: 'DUBLIN', displayName: 'Dublin' },
+  { name: 'DUNSANY', displayName: 'Dunsany' },
+  { name: 'FINNER', displayName: 'Finner' },
+  { name: 'GURTEEN', displayName: 'Gurteen' },
+  { name: 'JOHNSTOWN_CASTLE', displayName: 'Johnstown Castle' },
+  { name: 'KNOCK', displayName: 'Knock' },
+  { name: 'MACE_HEAD', displayName: 'Mace Head' },
+  { name: 'MALIN_HEAD', displayName: 'Malin Head' },
+  { name: 'MARKREE_CASTLE', displayName: 'Markree Castle' },
+  { name: 'MOORE_PARK', displayName: 'Moore Park' },
+  { name: 'MT_DILLON', displayName: 'Mt Dillon' },
+  { name: 'MULLINGAR', displayName: 'Mullingar' },
+  { name: 'NEWPORT_MAYO', displayName: 'NewportMayo' },
+  { name: 'OAK_PARK', displayName: 'Oak Park' },
+  { name: 'PHOENIX_PARK', displayName: 'Phoenix Park' },
+  { name: 'ROCHES_POINT', displayName: "Roche's Point" },
+  { name: 'SHANNON', displayName: 'Shannon' },
+  { name: 'SHERKIN_ISLAND', displayName: 'Sherkin Island' },
+  { name: 'VALENTIA', displayName: 'Valentia' },
+]

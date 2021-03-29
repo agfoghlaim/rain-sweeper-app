@@ -8,7 +8,8 @@ export function shuffleArray(a) {
   return a;
 }
 
-export async function fetchData() {
+export async function fetchData(station) {
+  // console.log(station, " fetch")
   const url = 'https://irish-apis.netlify.app/weather/api';
 
   const res = await fetch(url, {
@@ -20,7 +21,7 @@ export async function fetchData() {
     body: JSON.stringify({
       query: `
 				{
-					dailyData(station: ATHENRY) {
+					dailyData(station: ${station}) {
 						date
 						rain
 						hm

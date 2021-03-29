@@ -4,7 +4,11 @@ import React, {
   useCallback,
   useReducer,
   useRef,
+  useContext
 } from 'react';
+
+
+import { useSettings } from '../contexts/settingsContext';
 import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
 
 import GameInfo from './GameInfo';
@@ -54,6 +58,11 @@ export default function Board() {
   };
 
   const [realData, dispatch] = useReducer(gameReducer, initialState);
+
+  const {settings, settingsDispatch } = useSettings();
+ 
+
+
   const [newGame, setNewGame] = useState(undefined);
   const [gameOver, setGameOver] = useState(true);
 
@@ -65,7 +74,8 @@ export default function Board() {
   const { numWet, numLives } = realData;
   const go = useCallback(async function load() {
     try {
-      const allData = await fetchData();
+      let station = settings.selectedStation ? settings.selectedStation : 'ATHENRY';
+      const allData = await fetchData(station);
 
       dispatch({ type: 'SET_FETCHED_DATA', error: '', payload: allData });
     } catch (err) {

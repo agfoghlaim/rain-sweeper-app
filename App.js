@@ -3,12 +3,17 @@ import { StyleSheet, View } from 'react-native';
 
 import GameScreen from './screens/Game';
 import Header from './components/Header';
+
+import { SettingsProvider } from './contexts/settingsContext';
+
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Header title="Irish Rain Sweeper" />
-      <GameScreen />
-    </View>
+    <SettingsProvider>
+      <View style={styles.container}>
+        <Header title="Irish Rain Sweeper" />
+        <GameScreen />
+      </View>
+    </SettingsProvider>
   );
 }
 
