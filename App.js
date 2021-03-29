@@ -1,18 +1,31 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import GameScreen from './screens/Game';
 import Header from './components/Header';
 
 import { SettingsProvider } from './contexts/settingsContext';
 
+// navigation related
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Game from './screens/Game';
+import Settings from './screens/Settings';
+import About from './screens/About';
+
+const Tab = createBottomTabNavigator();
+
 export default function App() {
   return (
     <SettingsProvider>
-      <View style={styles.container}>
-        <Header title="Irish Rain Sweeper" />
-        <GameScreen />
-      </View>
+      <Header title="Irish Rain Sweeper" />
+
+      <NavigationContainer>
+        <Tab.Navigator>
+          <Tab.Screen name="Play" component={Game} />
+          <Tab.Screen name="Settings" component={Settings} />
+          <Tab.Screen name="About" component={About} />
+        </Tab.Navigator>
+      </NavigationContainer>
     </SettingsProvider>
   );
 }
