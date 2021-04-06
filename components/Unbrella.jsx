@@ -7,18 +7,19 @@ export default function Umbrella() {
 
   // Animate in.
   useEffect(() => {
+    function feedBackWhenUmbrellaAdded() {
+      Animated.spring(initialScale, {
+        toValue: 1,
+        friction: 4,
+        tension: 4,
+        duration: 100,
+        useNativeDriver: true,
+      }).start();
+    }
     feedBackWhenUmbrellaAdded();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function feedBackWhenUmbrellaAdded() {
-    Animated.spring(initialScale, {
-      toValue: 1,
-      friction: 4,
-      tension: 4,
-      duration: 100,
-      useNativeDriver: true,
-    }).start();
-  }
   return (
     <Animated.View
       style={{

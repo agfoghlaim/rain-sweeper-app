@@ -1,23 +1,35 @@
 import React from 'react';
+
 import { Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
-import { colors } from '../consts';
-import Nasties from './Nasties';
+
 import Umbrella from './Unbrella';
 
-export default function DryTile({
+import { colors, NUM_DAYS_IN_ROW } from '../consts';
+
+export default function WetTile({
   itemData,
   flagged,
   setFlagged,
-  handleDryClick,
+  handleWetClick,
   gameOver,
+  numLives,
+  setNumLives,
 }) {
+  const { date, culprit } = itemData;
 
-  const { checked, date, numNastyNeighbours } = itemData;
   function localHandlePress() {
     if (gameOver) return;
-    if (checked) return;
-    handleDryClick(itemData);
+    const currentLives = numLives;
+    if (currentLives > 0) {
+      const update = currentLives - 1;
+
+      setNumLives(update);
+      setFlagged(true);
+      return;
+    }
+    handleWetClick(itemData);
   }
+
   function handleLongPress() {
     if (gameOver) return;
     setFlagged(!flagged);
@@ -28,31 +40,28 @@ export default function DryTile({
       activeOpacity={0.6}
       underlayColor="#DDDDDD"
       style={{
-        ...styles.dryTile,
-        backgroundColor: checked ? `${colors.gray}` : `${colors.white}`,
-        borderColor: checked ? `${colors.white}` : 'transparent',
+        ...styles.wetTile,
+        backgroundColor: culprit ? colors.red : colors.blue,
       }}
       onPress={localHandlePress}
       onLongPress={handleLongPress}
     >
       <>
         <Text style={styles.date}>{date}</Text>
-
-        {checked && <Nasties numNastyNeighbours={numNastyNeighbours} />}
-
-        {flagged && !checked && !gameOver && <Umbrella />}
+        {flagged && !gameOver && <Umbrella />}
+        {gameOver && <Text>🌧️</Text>}
       </>
     </TouchableHighlight>
   );
 }
 
 const styles = StyleSheet.create({
-  dryTile: {
+  wetTile: {
     flex: 1,
-    overflow: 'hidden',
-    height: (Dimensions.get('window').width - 7 - 16) / 8,
+    height: (Dimensions.get('window').width - 7 - 16) / NUM_DAYS_IN_ROW,
     margin: 1,
     borderRadius: 2,
+    shadowColor: colors.black,
     borderColor: 'transparent',
     borderWidth: 0.5,
     justifyContent: 'center',

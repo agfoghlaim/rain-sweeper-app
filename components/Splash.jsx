@@ -19,7 +19,13 @@ export default function Splash({ win, numWet, rain, date, roll, setNewGame }) {
   return win ? (
     <View style={styles.splash}>
       <Text style={styles.emoji}>{msg === '' ? '😎' : msg}</Text>
-      <Text style={styles.text2}>You avoided {numWet} rainy days</Text>
+      <Text style={styles.text2}>
+        You avoided
+        {' '}
+        {numWet}
+        {' '}
+        rainy days
+      </Text>
       <Button
         color={colors.orange}
         onPress={localHandleDismissSplash}
@@ -31,7 +37,12 @@ export default function Splash({ win, numWet, rain, date, roll, setNewGame }) {
       <Text style={styles.text1}>Game Over</Text>
       <Text style={{ fontSize: 64 }}>☔</Text>
       <Text style={styles.text2}>
-        There was {rain}mm of rain on {date}
+        There was
+        {' '}
+        {rain}
+        mm of rain on
+        {' '}
+        {date}
       </Text>
     </View>
   );
@@ -40,7 +51,6 @@ export default function Splash({ win, numWet, rain, date, roll, setNewGame }) {
 const styles = StyleSheet.create({
   splash: {
     backgroundColor: colors.black,
-    width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
     width: '100%',
     position: 'absolute',

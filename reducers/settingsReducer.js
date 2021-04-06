@@ -22,7 +22,7 @@ export default function settingsReducer(state, action) {
       };
 
     default:
-      console.log('Default case settingsReducer.js');
+      console.warn('Default case settingsReducer.js');
       return {
         ...state,
       };

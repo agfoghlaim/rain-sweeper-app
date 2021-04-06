@@ -5,6 +5,7 @@ import {
   setCheckedToTrue,
   sliceNumDaysInAGameConst,
 } from '../util';
+
 function getGameData(allData) {
   const gameData = [
     // 1. shuffle allData,
@@ -18,6 +19,9 @@ function getGameData(allData) {
 
     // 4. add data[numNastyNeighbours] to gameData.
     addNumNastyNeighboursToShuffledData,
+
+    // airbnb linter wants reduce to be implicit return all on one line. Ignore it because I always write it like this & comfusing.
+    // eslint-disable-next-line arrow-body-style
   ].reduce((payload, fn) => {
     return fn(payload);
   }, allData);
@@ -41,7 +45,7 @@ export default function gameReducer(state, action) {
         loading: false,
         error: '',
         allData: action.payload.allData,
-        prevData: prevData,
+        prevData,
       };
     }
     case 'FETCH_ERROR':
@@ -119,17 +123,17 @@ export default function gameReducer(state, action) {
     case 'NUM_LIVES':
       return {
         ...state,
-        numLives: !isNaN(action.payload) ? action.payload : 0,
+        numLives: !Number.isNaN(action.payload) ? action.payload : 0,
       };
     case 'UPDATE_NUM_LIVES': {
-      const calcNumLives = function () {
+      const calcNumLives = () => {
         if (state.roll === 4) {
           return 1;
-        } else if (state.roll > 0 && state.roll % 9 === 0) {
-          return 2;
-        } else {
-          return 0;
         }
+        if (state.roll > 0 && state.roll % 9 === 0) {
+          return 2;
+        }
+        return 0;
       };
       const inc = calcNumLives();
       return {

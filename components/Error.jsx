@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { colors } from '../consts';
 
@@ -7,7 +6,9 @@ export default function Error({ msg, tryAgain }) {
   return (
     <View style={styles.loadingWrap}>
       <Text style={styles.emoji}>🤔</Text>
-      <Text style={styles.text}>{msg}...</Text>
+      <Text style={styles.text}>
+        {msg}
+      </Text>
       <View style={styles.tryAgainBtn}>
         <Button
           accessibilityLabel="Try fetching data again"

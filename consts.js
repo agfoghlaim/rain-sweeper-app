@@ -1,6 +1,6 @@
 export const colors = {
-	black: '#333131',
-	lightBlack: '#333131',
+  black: '#333131',
+  lightBlack: '#333131',
   white: '#fff',
   // orange: '#ffd900',
   orange: '#ffa410',
@@ -12,7 +12,7 @@ export const colors = {
   blue: '#396fb4',
   lightBlue: '#00e1ff',
   blackOpacity: 'rgba(51,49,49,0.3)',
-}
+};
 
 export const DIRECTIONS = [
   'west',
@@ -54,4 +54,4 @@ export const STATIONS = [
   { name: 'SHANNON_AIRPORT', displayName: 'Shannon Airport' },
   { name: 'SHERKIN_ISLAND', displayName: 'Sherkin Island' },
   { name: 'VALENTIA', displayName: 'Valentia' },
-]
+];

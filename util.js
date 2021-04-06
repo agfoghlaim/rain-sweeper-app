@@ -9,7 +9,6 @@ export function shuffleArray(a) {
 }
 
 export async function fetchData(station = 'ATHENRY') {
-
   const url = 'https://irish-apis.netlify.app/weather/api';
 
   const res = await fetch(url, {
@@ -19,26 +18,25 @@ export async function fetchData(station = 'ATHENRY') {
     },
 
     body: JSON.stringify({
-      query: `
-				{
+      // eslint-disable-next-line no-tabs
+      query: `{
 					dailyData(station: ${station}) {
 						date
 						rain
 					}
-				}
-				`,
+				}`,
     }),
   });
   const ans = await res.json();
-
 
   if (
     ans.errors ||
     !ans.data ||
     !ans.data.dailyData ||
     !ans.data.dailyData.length
-  )
+  ) {
     return false;
+  }
 
   // remove any null values
   const noNulls = ans.data.dailyData.filter((d) => d.rain !== null);
@@ -70,12 +68,14 @@ export async function fetchData(station = 'ATHENRY') {
   const allDataShuffled = shuffleArray(winnableData);
 
   // Format the dates.
+  // eslint-disable-next-line no-use-before-define
   const allDataWithNiceDates = formatDates(allDataShuffled);
 
   // Slice off gameData( .length === NUM_DAYS_IN_GAME )l
   const gameData = allDataWithNiceDates.slice(0, NUM_DAYS_IN_GAME);
 
   // Add .numNastyNeighbours to the gameData.
+  // eslint-disable-next-line no-use-before-define
   const gameDataWithNumNasties = addNumNastyNeighboursToShuffledData(gameData);
 
   // Return object.
@@ -89,21 +89,28 @@ export async function fetchData(station = 'ATHENRY') {
 }
 
 export function addNumNastyNeighboursToShuffledData(days) {
+  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < days.length; i++) {
     let numNastyNeighbours = 0;
 
     DIRECTIONS.forEach((direction) => {
       if (
+        // eslint-disable-next-line no-use-before-define
         shouldCheckInThisDirection(i)[direction]() &&
+        // eslint-disable-next-line no-use-before-define
         hasNastyNeighbour(i, direction, days)
       ) {
+        // eslint-disable-next-line no-plusplus
         numNastyNeighbours++;
       }
     });
 
+    // eslint-disable-next-line no-param-reassign
     days[i].numNastyNeighbours = numNastyNeighbours;
+
+    // eslint-disable-next-line no-param-reassign
     days[i].id = i;
-    //days[i].checked = false; // TODO fix this, move or change the name of this function which already has a really long name!.
+    // days[i].checked = false; // TODO fix this, move or change the name of this function which already has a really long name!.
   }
   return days;
 }

@@ -1,12 +1,13 @@
 import React, { createContext, useReducer, useContext } from 'react';
 import settingsReducer from '../reducers/settingsReducer';
- const SettingsContext = createContext(null);
+
+const SettingsContext = createContext(null);
 
 const initialSettings = {
   selectedStation: 'ATHENRY',
   stationChanged: false,
   selectedStationDisplay: 'Athenry',
-  stationChangeError: ''
+  stationChangeError: '',
 };
 
 export function SettingsProvider({ children }) {

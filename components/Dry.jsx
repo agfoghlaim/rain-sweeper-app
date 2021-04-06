@@ -1,39 +1,22 @@
-import React, { useEffect } from 'react';
-
+import React from 'react';
 import { Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
-
+import { colors } from '../consts';
+import Nasties from './Nasties';
 import Umbrella from './Unbrella';
 
-import { colors, NUM_DAYS_IN_ROW } from '../consts';
-
-export default function WetTile({
+export default function DryTile({
   itemData,
   flagged,
   setFlagged,
-  handleWetClick,
+  handleDryClick,
   gameOver,
-  numLives,
-  setNumLives,
 }) {
-  // Destructure from itemData.item.
-  // const {
-  //   item: { date, culprit },
-  // } = itemData;
-  const { date, culprit } = itemData;
-
+  const { checked, date, numNastyNeighbours } = itemData;
   function localHandlePress() {
     if (gameOver) return;
-    let currentLives = numLives;
-    if (currentLives > 0) {
-      const update = currentLives - 1;
-
-      setNumLives(update);
-      setFlagged(true);
-      return;
-    }
-    handleWetClick(itemData);
+    if (checked) return;
+    handleDryClick(itemData);
   }
-
   function handleLongPress() {
     if (gameOver) return;
     setFlagged(!flagged);
@@ -44,28 +27,31 @@ export default function WetTile({
       activeOpacity={0.6}
       underlayColor="#DDDDDD"
       style={{
-        ...styles.wetTile,
-        backgroundColor: culprit ? colors.red : colors.blue,
+        ...styles.dryTile,
+        backgroundColor: checked ? `${colors.gray}` : `${colors.white}`,
+        borderColor: checked ? `${colors.white}` : 'transparent',
       }}
       onPress={localHandlePress}
       onLongPress={handleLongPress}
     >
       <>
         <Text style={styles.date}>{date}</Text>
-        {flagged && !gameOver && <Umbrella />}
-        {gameOver && <Text>🌧️</Text>}
+
+        {checked && <Nasties numNastyNeighbours={numNastyNeighbours} />}
+
+        {flagged && !checked && !gameOver && <Umbrella />}
       </>
     </TouchableHighlight>
   );
 }
 
 const styles = StyleSheet.create({
-  wetTile: {
+  dryTile: {
     flex: 1,
-    height: (Dimensions.get('window').width - 7 - 16) / NUM_DAYS_IN_ROW,
+    overflow: 'hidden',
+    height: (Dimensions.get('window').width - 7 - 16) / 8,
     margin: 1,
     borderRadius: 2,
-    shadowColor: colors.black,
     borderColor: 'transparent',
     borderWidth: 0.5,
     justifyContent: 'center',

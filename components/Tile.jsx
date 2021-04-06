@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-import { Text, View } from 'react-native';
 import WetTile from './Wet';
 import DryTile from './Dry';
 
@@ -12,7 +11,6 @@ export default function Tile({
   numLives,
   setNumLives,
 }) {
-  // TODO: maybe these should stay here?
   const [flagged, setFlagged] = useState(false);
 
   useEffect(() => {

@@ -16,10 +16,12 @@
     },
 
     "rules": {
-        "object-curly-newline": ["error", { "multiline": true }],
+       // "object-curly-newline": ["error", { "multiline": true, "minProperties": 2}],
+        "object-curly-newline": 0,
         "max-len": ["error", { "ignoreComments": true }],
         "no-console": ["error", { "allow": ["warn", "error"] }],
         "operator-linebreak": ["error", "after"],
-        "no-use-before-define": ["error", { "variables": false }]
+        "no-use-before-define": ["error", { "variables": false, "functions": false }],
+        "react/prop-types": [0]
     }
 }

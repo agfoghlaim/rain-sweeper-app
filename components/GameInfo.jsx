@@ -13,49 +13,49 @@ export default function GameInfo({
   numLives,
   error,
   loading,
-  selectedStation
+  selectedStation,
 }) {
   const initialScale = useState(new Animated.Value(1))[0];
 
-  function drawAttentionToNextRoundButton() {
-    Animated.loop(
-      Animated.spring(initialScale, {
-        toValue: 1.02,
-        friction: 1,
-        tension: 1,
-        duration: 3000,
-        useNativeDriver: true,
-      })
-    ).start();
-  }
-
   const lives = useRef(null);
   useEffect(() => {
+    // This is from before the 'between rounds' splash had a button. It never actually happens anymore.
+    function drawAttentionToNextRoundButton() {
+      Animated.loop(
+        Animated.spring(initialScale, {
+          toValue: 1.02,
+          friction: 1,
+          tension: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+      ).start();
+    }
     if (!gameOver) return;
 
     if (win) {
       drawAttentionToNextRoundButton();
     }
-  }, [gameOver]);
-  
-  useEffect(()=> {
-    if(gameOver) return;
+  }, [gameOver, win, initialScale]);
+
+  useEffect(() => {
+    if (gameOver) return;
     lives.current = numLives;
-  },[gameOver])
-  //////////////////////////
-  
+
+    // This should only happen oncer per game...
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameOver]);
+
   const [emoji, setEmoji] = useState({ emoji: '🤔', desc: 'thinking emoji' });
   useEffect(() => {
-
-    if (!numLives) return;
+    if (!numLives) return undefined;
 
     if (numLives < lives.current) {
-
       setEmoji({ emoji: '🙄', desc: 'eyeroll emoji' });
 
       const timer = setTimeout(
         () => setEmoji({ emoji: '🤔', desc: 'thinking emoji' }),
-        300
+        300,
       );
 
       // Clean up setTimeout.
@@ -65,8 +65,8 @@ export default function GameInfo({
         }
       };
     }
+    return undefined;
   }, [numLives, lives, gameOver]);
-
 
   function decideEmoji() {
     if (gameOver && typeof newGame === 'undefined') {
@@ -74,39 +74,51 @@ export default function GameInfo({
         emoji: '😴',
         desc: 'sleeping emoji',
       };
-    } else if (!gameOver && typeof newGame === 'boolean') {
-      return emoji;
-    } else if (win && gameOver && typeof newGame === 'boolean') {
-      return { emoji: '😀', desc: 'grinning emoji' };
-    } else if (
-      typeof newGame === 'boolean' &&
-      typeof win === 'boolean' &&
-      gameOver
-    ) {
-      return { emoji: '😒', desc: 'sad emoji' };
-    } else {
-      return '';
     }
+    if (!gameOver && typeof newGame === 'boolean') {
+      return emoji;
+    }
+    if (win && gameOver && typeof newGame === 'boolean') {
+      return { emoji: '😀', desc: 'grinning emoji' };
+    }
+    if (typeof newGame === 'boolean' && typeof win === 'boolean' && gameOver) {
+      return { emoji: '😒', desc: 'sad emoji' };
+    }
+    return '';
+  }
+
+  function renderNumLives() {
+    if (numLives < 4 && numLives > 0) {
+      return Array.from(Array(numLives)).map(() => '🌂');
+    }
+    if (numLives && numLives > 0) {
+      return `🌂 x ${numLives}`;
+    }
+    if (numLives === 0) {
+      return '⚠️';
+    }
+
+    return '';
   }
 
   return (
     <View style={styles.gameInfo}>
       <Text style={styles.station}>{selectedStation}</Text>
-      <Text style={styles.score}>Score: {score}</Text>
-      <Text style={{ fontSize: 32 }}> {decideEmoji().emoji}</Text>
+      <Text style={styles.score}>
+        Score:
+        {score}
+      </Text>
+      <Text style={{ fontSize: 32 }}>{decideEmoji().emoji}</Text>
 
       {!gameOver ? (
         <>
           <Text style={styles.umbrellas}>
-            {numLives < 4 && numLives > 0
-              ? Array.from(Array(numLives)).map(() => '🌂')
-              : numLives === 0
-              ? '⚠️'
-              : numLives
-              ? `🌂 x ${numLives}`
-              : ''}
+            {renderNumLives()}
           </Text>
-          <Text style={styles.round}>Round: {roll + 1}</Text>
+          <Text style={styles.round}>
+            Round:
+            {roll + 1}
+          </Text>
         </>
       ) : (
         <Animated.View
@@ -134,30 +146,19 @@ export default function GameInfo({
 
 const styles = StyleSheet.create({
   gameInfo: {
-
     position: 'relative',
-    //  flex: 1,
-     minHeight: 64,
+    minHeight: 64,
     padding: 16,
-    // backgroundColor: colors.red,
     marginHorizontal: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    
     borderWidth: 2,
     borderRightColor: colors.white,
     borderBottomColor: colors.white,
     borderLeftColor: colors.darkGray,
     borderTopColor: colors.darkGray,
-    // marginVertical: 16,
-    // marginTop: 48,
     borderRadius: 4,
-    // borderBottomColor: colors.black,
-    // borderWidth: 8,
-    // borderTopWidth: 0,
-    // borderLeftWidth: 0,
-    // borderRightWidth: 0,
   },
   score: {
     fontFamily: 'monospace',
@@ -191,6 +192,5 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     paddingHorizontal: 6,
     borderRadius: 4,
-
   },
 });
