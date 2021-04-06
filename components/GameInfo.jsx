@@ -19,8 +19,7 @@ export default function GameInfo({
 
   const lives = useRef(null);
   useEffect(() => {
-    // This is from before the 'between rounds' splash had a button. It never actually happens anymore.
-    function drawAttentionToNextRoundButton() {
+    function drawAttentionToNewGameButton() {
       Animated.loop(
         Animated.spring(initialScale, {
           toValue: 1.02,
@@ -31,18 +30,15 @@ export default function GameInfo({
         }),
       ).start();
     }
-    if (!gameOver) return;
 
-    if (win) {
-      drawAttentionToNextRoundButton();
-    }
-  }, [gameOver, win, initialScale]);
+    drawAttentionToNewGameButton();
+  }, [initialScale]);
 
   useEffect(() => {
     if (gameOver) return;
     lives.current = numLives;
 
-    // This should only happen oncer per game...
+    // This should only happen once per game...
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameOver]);
 
@@ -112,9 +108,7 @@ export default function GameInfo({
 
       {!gameOver ? (
         <>
-          <Text style={styles.umbrellas}>
-            {renderNumLives()}
-          </Text>
+          <Text style={styles.umbrellas}>{renderNumLives()}</Text>
           <Text style={styles.round}>
             Round:
             {roll + 1}

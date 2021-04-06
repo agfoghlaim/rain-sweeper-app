@@ -19,35 +19,36 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   return (
     <GameProvider>
-    <SettingsProvider>
-      
-      <Header title="Irish Rain Sweeper" />
+      <SettingsProvider>
+        <Header title="Irish Rain Sweeper" />
 
-      <NavigationContainer>
-        <Tab.Navigator tabBarOptions={{
-        activeTintColor: colors.black,
-        activeBackgroundColor: colors.purple,
-        inactiveBackgroundColor: colors.black,
-        tabStyle: {
-  
-          justifyContent: 'flex-start',
-          paddingVertical: 14
-          
-        },
-        labelStyle: {
-          textTransform: 'uppercase',
-          fontWeight: 'bold',
-          letterSpacing: 1,
-          fontSize: 14
-          
-        }
-      }} >
-          <Tab.Screen name="Play" component={Game} />
-          <Tab.Screen name="Settings" component={Settings} />
-          <Tab.Screen name="About" component={About} />
-        </Tab.Navigator>
-      </NavigationContainer>
-    </SettingsProvider>
+        <NavigationContainer>
+          <Tab.Navigator
+            tabBarOptions={{
+              activeTintColor: colors.black,
+              activeBackgroundColor: colors.purple,
+              inactiveBackgroundColor: colors.black,
+
+              tabStyle: {
+                shadowColor: 'red',
+                justifyContent: 'flex-start',
+                paddingVertical: 14,
+              },
+
+              labelStyle: {
+                textTransform: 'uppercase',
+                fontWeight: 'bold',
+                letterSpacing: 1,
+                fontSize: 14,
+              },
+            }}
+          >
+            <Tab.Screen name="Play" component={Game} />
+            <Tab.Screen name="Settings" component={Settings} />
+            <Tab.Screen name="About" component={About} />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </SettingsProvider>
     </GameProvider>
   );
 }
@@ -60,8 +61,7 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   tab: {
-    backgroundColor: colors.blue,
-    borderWidth: 3,
-    borderBottomColor: colors.red
-  }
+    // backgroundColor: colors.red,
+    // borderWidth: 0,
+  },
 });

@@ -13,16 +13,18 @@ export default function Header({ title }) {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: colors.black,
+    backgroundColor: colors.darkGray,
     height: 90,
     width: '100%',
-    paddingTop: 40,
-
+    paddingTop: 48,
     alignItems: 'center',
     justifyContent: 'center',
+    borderBottomColor: colors.white,
+    borderBottomWidth: 1, // can't figure out how to remove border top on the bottom tab container so make it look like it's meant to be like that.
+
   },
   headerText: {
-    color: colors.white,
+    color: colors.black,
     fontSize: 16,
 
     fontWeight: '700',
