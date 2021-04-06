@@ -1,15 +1,8 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useReducer,
-  useRef,
-  useContext
-} from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
-
-import { useSettings } from '../contexts/settingsContext';
 import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
+import { useSettings } from '../contexts/settingsContext';
+import { useGame } from '../contexts/gameContext';
 
 import GameInfo from './GameInfo';
 import Tile from './Tile';
@@ -17,7 +10,6 @@ import Loading from './Loading';
 import Error from './Error';
 import Splash from './Splash';
 import {
-  prepData,
   fetchData,
   shouldCheckInThisDirection,
   getNeighbourToThe,
@@ -32,36 +24,22 @@ import {
   DIRECTIONS,
 } from '../consts';
 
-import gameReducer from '../reducers/gameReducer';
-
-// NOTE: culprit is now saved in two places. on realData.culprit as well as realData.data[i].culprit
-// NOTE: Date in the format 10 May '19 should be set initially in FETCH not individually everytime it's rendered.
+/*
+NOTE: culprit is now saved in two places. on realData.culprit as well as realData.data[i].culprit
+Date in the format 10 May '19 should be set initially in FETCH not individually everytime
+it's rendered
+*/
 
 export default function Board() {
-  /**
-   *
-   * When a <Dry> day is clicked, it's tricky to check neighbouring days and manage re-renders. Push all neighbours to be checked/revealed in here and update state all at once.
-   *
+  /*
+  When a <Dry> day is clicked, it's tricky to check neighbouring days and manage re-renders.
+  Push all neighbours to be checked/revealed in here and update state all at once.
    */
   const KEEP_TRACK = [];
 
-  const initialState = {
-    roll: 0,
-    score: 0,
-    loading: true,
-    error: '',
-    culprit: null,
-    allData: [], // all data shuffled & with numNastyNeighbours- ratio is 1:5 wet:dry
-    data: [], // game data, .length === NUM_DAYS_IN_GAME
-    numWet: undefined,
-    numLives: 3,
-  };
-
-  const [realData, dispatch] = useReducer(gameReducer, initialState);
-
-  const {settings, settingsDispatch } = useSettings();
- 
-
+  const { settings, settingsDispatch } = useSettings();
+  const { realData, dispatch } = useGame();
+  const { selectedStation, stationChanged, prevStation } = settings;
 
   const [newGame, setNewGame] = useState(undefined);
   const [gameOver, setGameOver] = useState(true);
@@ -70,19 +48,25 @@ export default function Board() {
   const [showSplash, setShowSplash] = useState(false);
   const splashTimer = useRef(null);
   const [betweenRounds, setBetweenRounds] = useState(false);
-  // const [numWet, setNumWet] = useState(null);
+
   const { numWet, numLives } = realData;
-  const go = useCallback(async function load() {
+
+  const go = useCallback(async () => {
     try {
-      let station = settings.selectedStation ? settings.selectedStation : 'ATHENRY';
-      const allData = await fetchData(station);
+      const allData = await fetchData(selectedStation);
+
+      if (!allData || allData.error) {
+        dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
+
+        return;
+      }
 
       dispatch({ type: 'SET_FETCHED_DATA', error: '', payload: allData });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       dispatch({ type: 'FETCH_ERROR', error: 'Error fetching data' });
     }
-  }, []);
+  }, [dispatch, selectedStation]);
 
   // Fetch data manually. In the case of no internet when the app loads, this can be called from the error component.
   function tryAgain() {
@@ -94,7 +78,22 @@ export default function Board() {
   useEffect(() => {
     dispatch({ type: 'FETCHING', error: '', loading: true });
     go();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Starting New Game (not just new round)... this should now happen whenever selectedStation is changed
+  useEffect(() => {
+    if (!newGame) return;
+    if (win) return;
+    dispatch({ type: 'RESET_ROLL' });
+    dispatch({ type: 'RESET SCORE' });
+    dispatch({ type: 'NUM_LIVES', payload: 3 });
+
+    if (stationChanged) {
+      settingsDispatch({ type: 'SET_STATION_CHANGED', payload: false });
+    }
+  }, [newGame, setWin, win, dispatch, stationChanged, settingsDispatch]);
 
   // Starting new round (or new Game)
   useEffect(() => {
@@ -102,30 +101,28 @@ export default function Board() {
 
     setGameOver(false);
     setWin(false);
+
     dispatch({ type: 'SHUFFLE' });
     dispatch({ type: 'CALC_WET_DAYS' });
+    setShowSplash(false);
     setNewGame(false);
-  }, [newGame, setWin]);
+  }, [newGame, setGameOver, setWin, prevStation, dispatch, setNewGame]);
 
-  // Starting New Game (not just new round)
   useEffect(() => {
-    /*
-    win === undefined means first round
-    win === true means new round
-    win === false means new Game/new round
-    */
-
-    if (!newGame) return;
-
-    if (win) return;
-    dispatch({ type: 'RESET_ROLL' });
-    dispatch({ type: 'RESET SCORE' });
-    dispatch({ type: 'NUM_LIVES', payload: 3 });
-  }, [newGame, setWin, win]);
+    if (!stationChanged) return;
+    function endGame() {
+      // This function only gets called when numLives === 0 so setGameOver immediately.
+      setGameOver(true);
+      setWin(false);
+      setShowSplash(false);
+      dispatch({ type: 'RESET_SCORE' });
+    }
+    endGame();
+  }, [stationChanged, dispatch]);
 
   // timeout to hide splash set in handle LOSE game
   useEffect(() => {
-    if (!showSplash || win) return;
+    if (!showSplash || win) return undefined;
 
     // Remove you lost splash after 3 seconds.
     splashTimer.current = setTimeout(() => setShowSplash(false), 3000);
@@ -141,9 +138,9 @@ export default function Board() {
 
   // Between Rounds.
   useEffect(() => {
-    if (!betweenRounds) return;
-    if (!gameOver) return;
-    if (!win) return;
+    if (!betweenRounds) return undefined;
+    if (!gameOver) return undefined;
+    if (!win) return undefined;
 
     // 1. Update numLives (for round 5 & %10 === 0)
     dispatch({ type: 'UPDATE_NUM_LIVES' });
@@ -166,7 +163,7 @@ export default function Board() {
         clearTimeout(splashTimer.current);
       }
     };
-  }, [betweenRounds, gameOver, win, setShowSplash, setBetweenRounds, numWet]);
+  }, [betweenRounds, gameOver, win, numWet, dispatch]);
 
   // Reveal all tiles on game over.
   useEffect(() => {
@@ -174,24 +171,24 @@ export default function Board() {
 
     // Reveal all tiles by setting all realData.data.checked = true.
     dispatch({ type: 'REVEAL_ALL' });
-  }, [gameOver]);
+  }, [gameOver, dispatch]);
 
   // Check if game should be over. This is for successful scenario. <Wet/> sets setGame(false) if a rainy day is clicked.
   useEffect(() => {
     if (gameOver) return;
 
-    // Check if game should be over (ie. all dry days checked).
-    const isGameOver = checkGameOver(realData.data);
-    if (isGameOver) {
+    // Check if round should be over (ie. all dry days checked).
+    const isRoundOver = checkGameOver(realData.data);
+    if (isRoundOver) {
       setGameOver(true);
       setWin(true);
       setBetweenRounds(true);
     }
-  }, [setGameOver, gameOver, realData.data, setWin]);
+  }, [setGameOver, gameOver, realData.data, setWin, settingsDispatch]);
 
-  //#endregion
+  // #endregion
 
-  //#region handlers
+  // #region handlers
   function handleWetClick(data) {
     // This function only gets called when numLives === 0 so setGameOver immediately.
     setGameOver(true);
@@ -233,8 +230,7 @@ export default function Board() {
     // Return if this day has already been checked.
     if (isChecked.length) return;
 
-    const numNastyNeighbours = realData.data[datum.id].numNastyNeighbours;
-
+    const { numNastyNeighbours } = realData.data[datum.id];
     // If this day has MORE than ZERO rainy days (bombs) surrounding it, push it into KEEP_TRACK so it won't get checked again. Then update state and return.
     if (numNastyNeighbours !== 0) {
       KEEP_TRACK.push(datum.id);
@@ -245,20 +241,26 @@ export default function Board() {
 
     // If this day has ZERO rainy days surrounding it, also push it into KEEP_TRACK so it won't get checked again. Also send it to checkNeighbour() to 'click' on it's surrounding days.
     KEEP_TRACK.push(datum.id);
+
+    // eslint-disable-next-line no-use-before-define
     checkNeighbour(datum);
 
     // If we get to here, the original day that was clicked on & all it's relevant neighbours are in KEEP_TRACK array.
     doTheUpdate(KEEP_TRACK);
 
+    // airbnb lint is freaking out because datum is named the same inside checkNeighbour scope (ignore it.)
+    // eslint-disable-next-line no-shadow
     function checkNeighbour(datum) {
       // Find days in each direction, 'click' on them.
+
+      // eslint-disable-next-line no-restricted-syntax
       for (const direction of DIRECTIONS) {
         if (shouldCheckInThisDirection(datum.id)[direction]()) {
           const thisOne = getNeighbourToThe(
             datum.id,
             direction,
             NUM_DAYS_IN_GAME,
-            NUM_DAYS_IN_ROW
+            NUM_DAYS_IN_ROW,
           );
 
           handleDryClick(realData.data[thisOne]);
@@ -266,7 +268,7 @@ export default function Board() {
       }
     }
   }
-  //#endregion handlers
+  // #endregion handlers
   function renderTiles(data) {
     return (
       <Tile
@@ -281,6 +283,32 @@ export default function Board() {
     );
   }
 
+  function decideComponent() {
+    if (
+      realData.data &&
+      realData.data.length &&
+      typeof win === 'boolean' &&
+      !stationChanged
+    ) {
+      return (
+        <FlatList
+          // eslint-disable-next-line no-use-before-define
+          style={styles.boardBg}
+          data={realData.data.slice(0, NUM_DAYS_IN_GAME)}
+          renderItem={renderTiles}
+          numColumns={NUM_DAYS_IN_ROW}
+          key={(item) => item.date}
+        />
+      );
+    }
+    if (!realData.loading && realData.error !== '') {
+      return <Error msg={realData.error} tryAgain={tryAgain} />;
+    }
+    if (realData.loading) {
+      return <Loading />;
+    }
+    return null;
+  }
   return (
     <View style={styles.boardWrap}>
       {showSplash && win && (
@@ -303,6 +331,7 @@ export default function Board() {
 
       <GameInfo
         style={styles.gameInfo}
+        selectedStation={selectedStation}
         score={realData.score}
         gameOver={gameOver}
         setNewGame={setNewGame}
@@ -314,35 +343,41 @@ export default function Board() {
         loading={realData.loading}
       />
 
-      <View style={styles.board}>
-        {!!realData.data &&
-        !!realData.data.length &&
-        typeof win === 'boolean' ? (
-          <FlatList
-            style={styles.boardBg}
-            data={realData.data.slice(0, NUM_DAYS_IN_GAME)}
-            renderItem={renderTiles}
-            numColumns={NUM_DAYS_IN_ROW}
-            key={(item) => item.date}
-          />
-        ) : !realData.loading && realData.error !== '' ? (
-          <Error msg={realData.error} tryAgain={tryAgain} />
-        ) : realData.loading ? (
-          <Loading />
-        ) : null}
-      </View>
+      <View style={styles.board}>{decideComponent()}</View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   boardWrap: {
-    flex: 1,
-    backgroundColor: colors.black,
-    padding: 8,
+    backgroundColor: colors.gray,
+    borderRadius: 4,
+    marginHorizontal: 8,
+    justifyContent: 'center',
+    paddingTop: 20,
+    marginVertical: 12,
   },
   board: {
-    flex: 6,
-    minHeight: Dimensions.get('window').width,
+    height: Dimensions.get('window').width + 6,
+    borderWidth: 2,
+    borderRightColor: colors.white,
+    borderBottomColor: colors.white,
+    borderLeftColor: colors.darkGray,
+    borderTopColor: colors.darkGray,
+    borderRadius: 4,
+    marginHorizontal: 4,
+    marginTop: 24,
+    marginBottom: 24,
+    padding: 4,
+  },
+  selectedStation: {
+    justifyContent: 'flex-start',
+    backgroundColor: colors.orange,
+    padding: 8,
+    borderRadius: 4,
+    fontSize: 10,
+    color: colors.black,
+    fontFamily: 'monospace',
+    elevation: 8,
   },
 });

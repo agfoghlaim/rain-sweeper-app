@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
 import { colors } from '../consts';
 import Nasties from './Nasties';
@@ -12,11 +12,7 @@ export default function DryTile({
   gameOver,
 }) {
 
-  // Destructure from itemData.item.
-  // const {
-  //   item: { checked, date, numNastyNeighbours },
-  // } = itemData;
-const { checked, date, numNastyNeighbours } = itemData;
+  const { checked, date, numNastyNeighbours } = itemData;
   function localHandlePress() {
     if (gameOver) return;
     if (checked) return;
@@ -34,13 +30,14 @@ const { checked, date, numNastyNeighbours } = itemData;
       style={{
         ...styles.dryTile,
         backgroundColor: checked ? `${colors.gray}` : `${colors.white}`,
+        borderColor: checked ? `${colors.white}` : 'transparent',
       }}
       onPress={localHandlePress}
       onLongPress={handleLongPress}
     >
       <>
         <Text style={styles.date}>{date}</Text>
-        
+
         {checked && <Nasties numNastyNeighbours={numNastyNeighbours} />}
 
         {flagged && !checked && !gameOver && <Umbrella />}
@@ -56,10 +53,8 @@ const styles = StyleSheet.create({
     height: (Dimensions.get('window').width - 7 - 16) / 8,
     margin: 1,
     borderRadius: 2,
-    shadowColor: colors.black,
-    elevation: 10,
-    borderColor: colors.white,
-    borderWidth: 2,
+    borderColor: 'transparent',
+    borderWidth: 0.5,
     justifyContent: 'center',
     alignItems: 'center',
   },

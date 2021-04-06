@@ -1,0 +1,25 @@
+{
+    "env": {
+        "browser": true,
+        "es2020": true
+    },
+    "extends": [
+        "airbnb",
+        "airbnb/hooks"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+
+    "rules": {
+        "object-curly-newline": ["error", { "multiline": true }],
+        "max-len": ["error", { "ignoreComments": true }],
+        "no-console": ["error", { "allow": ["warn", "error"] }],
+        "operator-linebreak": ["error", "after"],
+        "no-use-before-define": ["error", { "variables": false }]
+    }
+}

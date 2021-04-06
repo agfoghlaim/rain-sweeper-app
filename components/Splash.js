@@ -2,17 +2,8 @@ import React from 'react';
 import { View, StyleSheet, Dimensions, Text, Button } from 'react-native';
 import { colors } from '../consts';
 
-export default function Splash({
-  win,
-  numWet,
-  rain,
-  date,
-  roll,
-  setShowSplash,
-  setNewGame,
-}) {
+export default function Splash({ win, numWet, rain, date, roll, setNewGame }) {
   function localHandleDismissSplash() {
-    setShowSplash(false);
     setNewGame(true);
   }
 
@@ -20,7 +11,7 @@ export default function Splash({
   if (roll === 4) {
     msg = '😎🌂';
 
-    // 5. get two spare umbrellas every 10 rounds.
+    // Two spare umbrellas every 10 rounds.
   } else if (roll > 0 && roll % 10 === 0) {
     msg = '😎🌂🌂';
   }
@@ -49,10 +40,12 @@ export default function Splash({
 const styles = StyleSheet.create({
   splash: {
     backgroundColor: colors.black,
-    height: '100%',
     width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+    width: '100%',
     position: 'absolute',
     zIndex: 9,
+    left: 0,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,

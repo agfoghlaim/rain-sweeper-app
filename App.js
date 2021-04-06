@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 import Header from './components/Header';
 
 import { SettingsProvider } from './contexts/settingsContext';
+import { GameProvider } from './contexts/gameContext';
 
 // navigation related
 import { NavigationContainer } from '@react-navigation/native';
@@ -16,7 +17,9 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
+    <GameProvider>
     <SettingsProvider>
+      
       <Header title="Irish Rain Sweeper" />
 
       <NavigationContainer>
@@ -27,6 +30,7 @@ export default function App() {
         </Tab.Navigator>
       </NavigationContainer>
     </SettingsProvider>
+    </GameProvider>
   );
 }
 

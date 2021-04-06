@@ -26,6 +26,7 @@ export default function WetTile({
     let currentLives = numLives;
     if (currentLives > 0) {
       const update = currentLives - 1;
+
       setNumLives(update);
       setFlagged(true);
       return;
@@ -44,7 +45,7 @@ export default function WetTile({
       underlayColor="#DDDDDD"
       style={{
         ...styles.wetTile,
-        backgroundColor: culprit ? colors.red : colors.white,
+        backgroundColor: culprit ? colors.red : colors.blue,
       }}
       onPress={localHandlePress}
       onLongPress={handleLongPress}
@@ -65,9 +66,8 @@ const styles = StyleSheet.create({
     margin: 1,
     borderRadius: 2,
     shadowColor: colors.black,
-    elevation: 10,
-    borderColor: colors.white,
-    borderWidth: 2,
+    borderColor: 'transparent',
+    borderWidth: 0.5,
     justifyContent: 'center',
     alignItems: 'center',
   },

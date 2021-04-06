@@ -12,10 +12,9 @@ export default function Loading() {
 }
 
 const styles = StyleSheet.create({
-
-	loadingWrap: {
-		flex: 1,
-		justifyContent: 'center', 
-		alignItems: 'center'
-	}
+  loadingWrap: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

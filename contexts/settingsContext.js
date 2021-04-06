@@ -4,6 +4,9 @@ import settingsReducer from '../reducers/settingsReducer';
 
 const initialSettings = {
   selectedStation: 'ATHENRY',
+  stationChanged: false,
+  selectedStationDisplay: 'Athenry',
+  stationChangeError: ''
 };
 
 export function SettingsProvider({ children }) {

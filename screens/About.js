@@ -5,17 +5,16 @@ import { colors } from '../consts';
 export default function AboutScreen() {
   return (
     <View style={styles.aboutScreenWrap}>
-      <Text style={styles.heading}>About</Text>
+      {/* <Text style={styles.heading}>About</Text> */}
       <Text style={styles.text}>
         Galway RainSweeper is something like Minesweeper except instead of mines
         there are rainy days and instead of flags there are umbrellas. The game
-        uses real Met Éireann data taken from Athenry weather station. 
+        uses real Met Éireann data. 
       </Text>
 			<Text style={styles.text}>
 			You get
         three spare umbrellas for every game, these open automatically if you
-        choose a rainy day. You can add/remove your own umbrellas by right
-        clicking or pressing spacebar. The more rounds you clear the more spare
+        choose a rainy day. You can add/remove your own umbrellas by long pressing. The more rounds you clear the more spare
         umbrellas you can collect.
 			</Text>
     </View>
@@ -30,12 +29,12 @@ const styles = StyleSheet.create({
 		padding: 16,
 		justifyContent: 'center'
   },
-	heading: {
-		color: colors.white,
-		fontSize: 24,
-		fontWeight: 'bold',
-		marginBottom: 18
-	},
+	// heading: {
+	// 	color: colors.white,
+	// 	fontSize: 24,
+	// 	fontWeight: 'bold',
+	// 	marginBottom: 18
+	// },
 	text: {
 		color: colors.white,
 		marginBottom: 8,

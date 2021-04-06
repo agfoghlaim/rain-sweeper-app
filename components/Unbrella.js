@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { Text, Animated } from 'react-native';
 
-export default function Umbrella({}) {
+export default function Umbrella() {
   const initialScale = useState(new Animated.Value(4))[0];
 
   // Animate in.

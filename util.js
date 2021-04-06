@@ -8,8 +8,8 @@ export function shuffleArray(a) {
   return a;
 }
 
-export async function fetchData(station) {
-  // console.log(station, " fetch")
+export async function fetchData(station = 'ATHENRY') {
+
   const url = 'https://irish-apis.netlify.app/weather/api';
 
   const res = await fetch(url, {
@@ -24,7 +24,6 @@ export async function fetchData(station) {
 					dailyData(station: ${station}) {
 						date
 						rain
-						hm
 					}
 				}
 				`,
@@ -32,8 +31,20 @@ export async function fetchData(station) {
   });
   const ans = await res.json();
 
+
+  if (
+    ans.errors ||
+    !ans.data ||
+    !ans.data.dailyData ||
+    !ans.data.dailyData.length
+  )
+    return false;
+
+  // remove any null values
+  const noNulls = ans.data.dailyData.filter((d) => d.rain !== null);
+
   // Split the response into {wet, dry}.
-  const split = ans.data.dailyData.reduce(
+  const split = noNulls.reduce(
     (acc, cur) => {
       if (cur.rain > 0) {
         acc.wet.push(cur);
@@ -48,6 +59,9 @@ export async function fetchData(station) {
   // Shuffle the wet/dry arrays.
   const wet = shuffleArray(split.wet);
   const dry = shuffleArray(split.dry);
+
+  // Return if there's not enough data available to play.
+  if (wet.length < 200 || dry.length < 1000) return false;
 
   // Concat wet/dry arrays @ 5:1 (dry:wet) ratio.
   const winnableData = dry.slice(0, 1000).concat(wet.slice(0, 200));
@@ -67,6 +81,7 @@ export async function fetchData(station) {
   // Return object.
   // object.allData length is 1200 long & can be shuffled to create more gameData without re fetching.
   // object.gameData length is NUM_DAYS_IN_GAME
+
   return {
     allData: allDataShuffled,
     gameData: gameDataWithNumNasties,
