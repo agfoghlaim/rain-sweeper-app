@@ -12,6 +12,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Game from './screens/Game';
 import Settings from './screens/Settings';
 import About from './screens/About';
+import { colors } from './consts';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,7 +24,24 @@ export default function App() {
       <Header title="Irish Rain Sweeper" />
 
       <NavigationContainer>
-        <Tab.Navigator>
+        <Tab.Navigator tabBarOptions={{
+        activeTintColor: colors.black,
+        activeBackgroundColor: colors.purple,
+        inactiveBackgroundColor: colors.black,
+        tabStyle: {
+  
+          justifyContent: 'flex-start',
+          paddingVertical: 14
+          
+        },
+        labelStyle: {
+          textTransform: 'uppercase',
+          fontWeight: 'bold',
+          letterSpacing: 1,
+          fontSize: 14
+          
+        }
+      }} >
           <Tab.Screen name="Play" component={Game} />
           <Tab.Screen name="Settings" component={Settings} />
           <Tab.Screen name="About" component={About} />
@@ -41,4 +59,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignContent: 'center',
   },
+  tab: {
+    backgroundColor: colors.blue,
+    borderWidth: 3,
+    borderBottomColor: colors.red
+  }
 });

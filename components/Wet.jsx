@@ -41,7 +41,7 @@ export default function WetTile({
       underlayColor="#DDDDDD"
       style={{
         ...styles.wetTile,
-        backgroundColor: culprit ? colors.red : colors.blue,
+        backgroundColor: culprit ? colors.red : colors.white,
       }}
       onPress={localHandlePress}
       onLongPress={handleLongPress}
