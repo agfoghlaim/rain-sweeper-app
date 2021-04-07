@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Galway RainSweeper",
+    "name": "Irish Rain Sweeper",
     "slug": "rain-sweeper",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -23,7 +23,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "ie.marie.galway_rain_sweeper",
+      "package": "ie.marie.irish_rain_sweeper",
       "versionCode": 6,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

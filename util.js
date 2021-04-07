@@ -1,8 +1,9 @@
 import { DIRECTIONS, NUM_DAYS_IN_GAME, NUM_DAYS_IN_ROW } from './consts';
 
 export function shuffleArray(a) {
-  for (let i = a.length - 1; i > 0; i--) {
+  for (let i = a.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
+    // eslint-disable-next-line no-param-reassign
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
@@ -51,7 +52,7 @@ export async function fetchData(station = 'ATHENRY') {
       }
       return acc;
     },
-    { wet: [], dry: [] }
+    { wet: [], dry: [] },
   );
 
   // Shuffle the wet/dry arrays.
@@ -183,6 +184,7 @@ export function getNeighbourToThe(i, direction) {
 
 export function formatDates(arr) {
   return arr.map((item) => {
+    // eslint-disable-next-line no-param-reassign
     item.date = sweeperDate(item.date);
     return item;
   });
@@ -190,12 +192,14 @@ export function formatDates(arr) {
 
 export function setCheckedToFalse(arr) {
   return arr.map((day) => {
+    // eslint-disable-next-line no-param-reassign
     day.checked = false;
     return day;
   });
 }
 export function setCheckedToTrue(arr) {
   return arr.map((day) => {
+    // eslint-disable-next-line no-param-reassign
     day.checked = true;
     return day;
   });

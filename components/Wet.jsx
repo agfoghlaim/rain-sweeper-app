@@ -58,6 +58,7 @@ export default function WetTile({
 const styles = StyleSheet.create({
   wetTile: {
     flex: 1,
+    overflow: 'hidden',
     height: (Dimensions.get('window').width - 7 - 16) / NUM_DAYS_IN_ROW,
     margin: 1,
     borderRadius: 2,

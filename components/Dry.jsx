@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
-import { colors } from '../consts';
+import { colors, NUM_DAYS_IN_ROW } from '../consts';
 import Nasties from './Nasties';
 import Umbrella from './Unbrella';
 
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   dryTile: {
     flex: 1,
     overflow: 'hidden',
-    height: (Dimensions.get('window').width - 7 - 16) / 8,
+    height: (Dimensions.get('window').width - 7 - 16) / NUM_DAYS_IN_ROW,
     margin: 1,
     borderRadius: 2,
     borderColor: 'transparent',

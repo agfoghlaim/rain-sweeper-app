@@ -26,8 +26,6 @@ import {
 
 /*
 NOTE: culprit is now saved in two places. on realData.culprit as well as realData.data[i].culprit
-Date in the format 10 May '19 should be set initially in FETCH not individually everytime
-it's rendered
 */
 
 export default function Board() {
@@ -38,18 +36,18 @@ export default function Board() {
   const KEEP_TRACK = [];
 
   const { settings, settingsDispatch } = useSettings();
-  const { realData, dispatch } = useGame();
   const { selectedStation, stationChanged, prevStation } = settings;
+
+  const { realData, dispatch } = useGame();
+  const { numWet, numLives } = realData;
 
   const [newGame, setNewGame] = useState(undefined);
   const [gameOver, setGameOver] = useState(true);
-
   const [win, setWin] = useState(undefined);
   const [showSplash, setShowSplash] = useState(false);
-  const splashTimer = useRef(null);
   const [betweenRounds, setBetweenRounds] = useState(false);
 
-  const { numWet, numLives } = realData;
+  const splashTimer = useRef(null);
 
   const go = useCallback(async () => {
     try {
@@ -73,6 +71,8 @@ export default function Board() {
     dispatch({ type: 'FETCHING', error: '', loading: true });
     go();
   }
+
+  // #region useEffects
 
   // Fetch data on load
   useEffect(() => {
@@ -269,6 +269,10 @@ export default function Board() {
     }
   }
   // #endregion handlers
+
+  // #region render related functions
+
+  // renderItem function for FlatList component
   function renderTiles(data) {
     return (
       <Tile
@@ -283,6 +287,7 @@ export default function Board() {
     );
   }
 
+  // Render either the game, error or loading.
   function decideComponent() {
     if (
       realData.data &&
@@ -309,6 +314,9 @@ export default function Board() {
     }
     return null;
   }
+
+  // #endregion
+
   return (
     <View style={styles.boardWrap}>
       {showSplash && win && (

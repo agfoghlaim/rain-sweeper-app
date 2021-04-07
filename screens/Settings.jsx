@@ -1,6 +1,4 @@
 import React from 'react';
-import { useSettings } from '../contexts/settingsContext';
-import { useGame } from '../contexts/gameContext';
 import {
   View,
   Text,
@@ -9,9 +7,16 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+
+import { useSettings } from '../contexts/settingsContext';
+import { useGame } from '../contexts/gameContext';
+
 import { colors, STATIONS } from '../consts';
-import Loading from '../components/Loading';
 import { fetchData } from '../util';
+
+import Loading from '../components/Loading';
+import Header from '../components/Header';
+import { ColorAndroid } from 'react-native/Libraries/StyleSheet/PlatformColorValueTypesAndroid';
 
 export default function SettingsScreen() {
   const { settings, settingsDispatch } = useSettings();
@@ -21,7 +26,7 @@ export default function SettingsScreen() {
   const { loading } = realData;
 
   async function handleSelectStation(e, station) {
-    settingsDispatch({ type: 'STATION_CHANGE_ERROR', payload: `` });
+    settingsDispatch({ type: 'STATION_CHANGE_ERROR', payload: '' });
     dispatch({ type: 'FETCHING', error: '', loading: true });
 
     try {
@@ -55,7 +60,6 @@ export default function SettingsScreen() {
 
       // Game screen does not need to know about errors (because it will continue as if there was no attempt to change the station) but it needs to know about loading to display a spinner. Loading is set to true above when gameReducer 's action is used for the request but it has to be manually set back to false on error.
       dispatch({ type: 'SET_LOADING', loading: false });
-      return;
     }
   }
 
@@ -75,35 +79,40 @@ export default function SettingsScreen() {
     );
   }
   return (
-    <View style={styles.settingsScreenWrap}>
-      {stationChangeError ? (
-        <Text style={styles.stationError}>{stationChangeError}</Text>
-      ) : loading ? (
-        <>
-          <View
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              backgroundColor: 'transparent',
-              zIndex: 2,
-            }}
-          >
-            <Loading />
-          </View>
+    <>
+      <Header title="Irish Rain Sweeper" />
+      <View style={styles.settingsScreenWrap}>
+        {!!stationChangeError && (
+          <Text style={styles.stationError}>{stationChangeError}</Text>
+        )}
 
-          {/* Don't delete overlay. It's because of transparancy problems with full screen loading spinner. */}
-          <View opacity={0.8} style={styles.overlay}></View>
-        </>
-      ) : null}
+        {!!loading && (
+          <>
+            <View
+              style={{
+                width: '100%',
+                height: '100%',
+                position: 'absolute',
+                backgroundColor: 'transparent',
+                zIndex: 2,
+              }}
+            >
+              <Loading />
+            </View>
 
-      <FlatList
-        keyExtractor={(item) => item.name}
-        numColumns={2}
-        data={STATIONS}
-        renderItem={renderStations}
-      />
-    </View>
+            {/* Don't delete overlay. It's because of transparancy problems with full screen loading spinner. */}
+            <View opacity={0.8} style={styles.overlay} />
+          </>
+        )}
+        <Text style={styles.instructions}>Choose a weather station...</Text>
+        <FlatList
+          keyExtractor={(item) => item.name}
+          numColumns={2}
+          data={STATIONS}
+          renderItem={renderStations}
+        />
+      </View>
+    </>
   );
 }
 
@@ -119,11 +128,21 @@ const styles = StyleSheet.create({
   },
   settingsScreenWrap: {
     flex: 1,
-    backgroundColor: colors.black,
+    backgroundColor: colors.darkBlack,
     padding: 16,
     justifyContent: 'center',
   },
-
+  instructions: {
+    marginHorizontal: 8,
+    marginBottom: 16,
+    paddingVertical: 2,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    alignContent: 'flex-start',
+    backgroundColor: colors.black,
+    color: colors.gray,
+    fontSize: 14,
+  },
   station: {
     flex: 1,
     backgroundColor: colors.white,
