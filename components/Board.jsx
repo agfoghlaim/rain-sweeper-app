@@ -46,7 +46,7 @@ export default function Board() {
   const [win, setWin] = useState(undefined);
   const [showSplash, setShowSplash] = useState(false);
   const [betweenRounds, setBetweenRounds] = useState(false);
-
+  const [umbrellasUsed, setUmbrellasUsed] = useState(0);
   const splashTimer = useRef(null);
 
   const go = useCallback(async () => {
@@ -107,6 +107,11 @@ export default function Board() {
     setShowSplash(false);
     setNewGame(false);
   }, [newGame, setGameOver, setWin, prevStation, dispatch, setNewGame]);
+
+  // For every new game, reset umbrellasUsed.
+  useEffect(() => {
+    setUmbrellasUsed(0);
+  }, [newGame]);
 
   useEffect(() => {
     if (!stationChanged) return;
@@ -268,6 +273,16 @@ export default function Board() {
       }
     }
   }
+
+  // Either increment or decrement umbrellas used (from Wet/Dry Tile components).
+  // GameInfo component needs this so it can calculate numWet vs umbrellasUsed.
+  function handleSetUmbrellasUsed() {
+    const currentUmbrellas = umbrellasUsed;
+    return {
+      decrement: () => setUmbrellasUsed(currentUmbrellas - 1),
+      increment: () => setUmbrellasUsed(currentUmbrellas + 1),
+    };
+  }
   // #endregion handlers
 
   // #region render related functions
@@ -282,6 +297,7 @@ export default function Board() {
         handleDryClick={handleDryClick}
         gameOver={gameOver}
         numLives={numLives}
+        handleSetUmbrellasUsed={handleSetUmbrellasUsed}
         setNumLives={(pay) => dispatch({ type: 'NUM_LIVES', payload: pay })}
       />
     );
@@ -344,6 +360,8 @@ export default function Board() {
         gameOver={gameOver}
         setNewGame={setNewGame}
         newGame={newGame}
+        numWet={numWet}
+        umbrellasUsed={umbrellasUsed}
         win={win}
         roll={realData.roll}
         numLives={numLives}

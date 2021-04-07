@@ -11,12 +11,14 @@ export default function GameInfo({
   win,
   roll,
   numLives,
+  numWet,
   error,
   loading,
   selectedStation,
+  umbrellasUsed,
 }) {
   const initialScale = useState(new Animated.Value(1))[0];
-
+  const [umbrellasVsWet, setUmbrellasVsWet] = useState(' ');
   const lives = useRef(null);
   useEffect(() => {
     function drawAttentionToNewGameButton() {
@@ -34,6 +36,15 @@ export default function GameInfo({
     drawAttentionToNewGameButton();
   }, [initialScale]);
 
+  // Run once for every new game. Initialise umbrellasVsWet to numWet.
+  useEffect(() => {
+    const shouldBeNum = numWet;
+    if (Number.isNaN(shouldBeNum)) {
+      return;
+    }
+    setUmbrellasVsWet(shouldBeNum);
+  }, [numWet, newGame]);
+
   useEffect(() => {
     if (gameOver) return;
     lives.current = numLives;
@@ -41,6 +52,15 @@ export default function GameInfo({
     // This should only happen once per game...
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameOver]);
+
+  // Run when umbrella is added or removed in Wet/Dry Tile component or when numWet changes (ie. new game).
+  useEffect(() => {
+    const ans = numWet - umbrellasUsed;
+    if (Number.isNaN(ans)) {
+      return;
+    }
+    setUmbrellasVsWet(ans);
+  }, [umbrellasUsed, numWet]);
 
   const [emoji, setEmoji] = useState({ emoji: '🤔', desc: 'thinking emoji' });
   useEffect(() => {
@@ -80,7 +100,7 @@ export default function GameInfo({
     if (typeof newGame === 'boolean' && typeof win === 'boolean' && gameOver) {
       return { emoji: '😒', desc: 'sad emoji' };
     }
-    return '';
+    return { emoji: '🤔', desc: 'thinking emoji' };
   }
 
   function renderNumLives() {
@@ -100,20 +120,25 @@ export default function GameInfo({
   return (
     <View style={styles.gameInfo}>
       <Text style={styles.station}>{selectedStation}</Text>
-      <Text style={styles.score}>
-        Score:
-        {score}
-      </Text>
-      <Text style={{ fontSize: 32 }}>{decideEmoji().emoji}</Text>
+      <View style={styles.left}>
+        <Text style={styles.numWet}>{umbrellasVsWet}</Text>
+        <Text style={styles.score}>
+          Score:
+          {score}
+        </Text>
+      </View>
+
+      <Text style={styles.faceEmoji}>{decideEmoji().emoji}</Text>
 
       {!gameOver ? (
-        <>
-          <Text style={styles.umbrellas}>{renderNumLives()}</Text>
+        <View style={styles.right}>
+          <Text style={styles.umbrellas}>{!gameOver && renderNumLives()}</Text>
+
           <Text style={styles.round}>
             Round:
             {roll + 1}
           </Text>
-        </>
+        </View>
       ) : (
         <Animated.View
           style={{
@@ -142,7 +167,8 @@ const styles = StyleSheet.create({
   gameInfo: {
     position: 'relative',
     minHeight: 64,
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 8,
     marginHorizontal: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -154,22 +180,51 @@ const styles = StyleSheet.create({
     borderTopColor: colors.darkGray,
     borderRadius: 4,
   },
+  left: {
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+  },
+
+  faceEmoji: {
+    fontSize: 32,
+    alignSelf: 'center',
+    borderRightColor: colors.darkGray,
+    borderBottomColor: colors.darkGray,
+    borderLeftColor: colors.white,
+    borderTopColor: colors.white,
+    borderWidth: 2,
+    borderRadius: 4,
+    paddingLeft: 3,
+  },
+  umbrellas: {
+    marginBottom: 4,
+    backgroundColor: colors.white,
+    alignSelf: 'flex-end',
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    letterSpacing: -4,
+    color: colors.white,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+    minWidth: 24,
+  },
   score: {
     fontFamily: 'monospace',
-    fontWeight: '600',
+    fontWeight: 'bold',
     fontSize: 14,
-    color: colors.purple,
-    backgroundColor: colors.white,
+    color: colors.white,
+    backgroundColor: colors.purple,
     paddingVertical: 3,
     paddingHorizontal: 6,
     borderRadius: 4,
   },
   round: {
     fontFamily: 'monospace',
-    fontWeight: '600',
+    fontWeight: 'bold',
     fontSize: 14,
-    color: colors.white,
-    backgroundColor: colors.purple,
+    color: colors.purple,
+    backgroundColor: colors.white,
     paddingVertical: 3,
     paddingHorizontal: 6,
     borderRadius: 4,
@@ -178,13 +233,27 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
     fontWeight: '500',
     fontSize: 8,
-    top: -2,
-    left: -2,
+    top: -22,
+    left: -6,
     color: colors.black,
     position: 'absolute',
     backgroundColor: colors.orange,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    borderRadius: 4,
+  },
+  numWet: {
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    letterSpacing: -2,
+    alignSelf: 'flex-start',
+    marginBottom: 4,
+    color: colors.white,
+    marginRight: 4,
+    backgroundColor: colors.purple,
     paddingVertical: 3,
     paddingHorizontal: 6,
     borderRadius: 4,
+    minWidth: 24,
   },
 });

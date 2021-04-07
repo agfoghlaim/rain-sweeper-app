@@ -14,6 +14,7 @@ export default function WetTile({
   gameOver,
   numLives,
   setNumLives,
+  handleSetUmbrellasUsed,
 }) {
   const { date, culprit } = itemData;
 
@@ -25,6 +26,7 @@ export default function WetTile({
 
       setNumLives(update);
       setFlagged(true);
+      handleLongPress();
       return;
     }
     handleWetClick(itemData);
@@ -32,6 +34,12 @@ export default function WetTile({
 
   function handleLongPress() {
     if (gameOver) return;
+    if (!flagged) {
+      // tile is being flagged, need to track this to show on top in gameInfo.
+      handleSetUmbrellasUsed().increment();
+    } else {
+      handleSetUmbrellasUsed().decrement();
+    }
     setFlagged(!flagged);
   }
 

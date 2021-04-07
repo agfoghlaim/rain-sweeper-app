@@ -10,6 +10,7 @@ export default function DryTile({
   setFlagged,
   handleDryClick,
   gameOver,
+  handleSetUmbrellasUsed,
 }) {
   const { checked, date, numNastyNeighbours } = itemData;
   function localHandlePress() {
@@ -19,6 +20,12 @@ export default function DryTile({
   }
   function handleLongPress() {
     if (gameOver) return;
+    if (!flagged) {
+      // tile is being flagged, need to track this to show on top in gameInfo.
+      handleSetUmbrellasUsed().increment();
+    } else {
+      handleSetUmbrellasUsed().decrement();
+    }
     setFlagged(!flagged);
   }
 

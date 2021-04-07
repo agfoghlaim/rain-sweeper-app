@@ -24,7 +24,7 @@
     },
     "android": {
       "package": "ie.marie.irish_rain_sweeper",
-      "versionCode": 6,
+      "versionCode": 7,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"

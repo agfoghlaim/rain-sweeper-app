@@ -10,6 +10,7 @@ export default function Tile({
   handleWetClick,
   numLives,
   setNumLives,
+  handleSetUmbrellasUsed,
 }) {
   const [flagged, setFlagged] = useState(false);
 
@@ -27,6 +28,7 @@ export default function Tile({
       gameOver={gameOver}
       setFlagged={setFlagged}
       flagged={flagged}
+      handleSetUmbrellasUsed={handleSetUmbrellasUsed}
     />
   ) : (
     <WetTile
@@ -37,6 +39,7 @@ export default function Tile({
       flagged={flagged}
       numLives={numLives}
       setNumLives={setNumLives}
+      handleSetUmbrellasUsed={handleSetUmbrellasUsed}
     />
   );
 }
