@@ -24,10 +24,10 @@
     },
     "android": {
       "package": "ie.marie.irish_rain_sweeper",
-      "versionCode": 7,
+      "versionCode": 11,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#ffffff"
       },
       "permissions": []
     },
